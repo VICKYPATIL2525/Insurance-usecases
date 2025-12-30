@@ -19,6 +19,11 @@ from typing import List
 # Load environment variables from .env file
 load_dotenv()
 
+# Folder Path
+folder_path = r"data\Kamala_Venkatesh_HIGH"
+
+
+
 class UnderwritingAnalysis(BaseModel):
     """Structured output model for underwriting analysis."""
     risk_score: int = Field(..., ge=0, le=100, description="Risk score between 0 and 100")
@@ -225,7 +230,7 @@ if __name__ == "__main__":
     import time
 
     # Specify the folder path here
-    folder_path = r"statement_5_underwriting_data\Kamala_Venkatesh_HIGH"
+    folder_path = folder_path
 
     start_time = time.time()
 

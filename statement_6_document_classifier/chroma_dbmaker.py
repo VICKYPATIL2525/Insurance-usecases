@@ -5,8 +5,8 @@ from langchain_community.vectorstores import Chroma
 
 
 # ---------------- CONFIG ----------------
-REFERENCE_PDF_FOLDER = "statement_6_insurance_documents\\vector_db"
-CHROMA_DB_PATH = "chroma_store"
+REFERENCE_PDF_FOLDER = "data\\vector_db"
+CHROMA_DB_PATH = "../shared/chroma_store"
 COLLECTION_NAME = "insurance_reference_docs"
 
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"

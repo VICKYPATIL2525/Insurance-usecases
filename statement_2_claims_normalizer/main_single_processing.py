@@ -93,8 +93,8 @@ result = normalize_claim_text(claim_text)
 print(result)
 
 # Save to JSON file with timestamp
-os.makedirs("statement_2_json_output", exist_ok=True)  # Create output directory if it doesn't exist
+os.makedirs("output", exist_ok=True)  # Create output directory if it doesn't exist
 timestamp = datetime.now().strftime("%d-%m-%Y_%I-%M-%S_%p")  # Format: DD-MM-YYYY_HH-MM-SS_AM/PM
-filename = f"jsonoutput/claim_output_{timestamp}.json"
+filename = f"output/claim_output_{timestamp}.json"
 with open(filename, "w") as f:
     json.dump(result, f, indent=2)  # Save with pretty formatting

@@ -5,8 +5,8 @@ from langchain_huggingface import HuggingFaceEmbeddings
 
 
 # ---------------- Paths ----------------
-JSON_PATH = "st4data.json"
-CHROMA_DIR = "chroma_store"
+JSON_PATH = "data/statement_4_data.json"
+CHROMA_DIR = "../shared/chroma_store"
 
 print("🔹 Starting insurance quote ingestion pipeline...\n")
 

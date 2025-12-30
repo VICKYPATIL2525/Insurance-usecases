@@ -84,9 +84,9 @@ Front bumper damaged badly, airbags deployed. Driver safe.
     print(result)
 
     # Save to JSON file with timestamp
-    os.makedirs("jsonoutput", exist_ok=True)  # Create output directory if it doesn't exist
+    os.makedirs("output", exist_ok=True)  # Create output directory if it doesn't exist
     timestamp = datetime.now().strftime("%d-%m-%Y_%I-%M-%S_%p")  # Format: DD-MM-YYYY_HH-MM-SS_AM/PM
-    filename = f"jsonoutput/claim_output_{timestamp}.json"
+    filename = f"output/claim_output_{timestamp}.json"
     with open(filename, "w") as f:
         json.dump(result, f, indent=2)  # Save with pretty formatting
 
@@ -97,7 +97,7 @@ def process_batch_claims():
     """Process multiple claims from CSV file"""
     print("\n=== BATCH CLAIM PROCESSING ===\n")
 
-    csv_file = "statement_2_claims.csv"
+    csv_file = "data/statement_2_claims.csv"
 
     # Check if CSV file exists
     if not os.path.exists(csv_file):
@@ -113,7 +113,7 @@ def process_batch_claims():
     print(f"Found {len(claims)} claims to process\n")
 
     results = []  # Store all processed results
-    os.makedirs("jsonoutput", exist_ok=True)  # Create output directory if it doesn't exist
+    os.makedirs("output", exist_ok=True)  # Create output directory if it doesn't exist
 
     # Process each claim from the CSV file
     for idx, claim in enumerate(claims, 1):
@@ -136,7 +136,7 @@ def process_batch_claims():
             results.append(result_with_id)  # Add to overall results list
 
             # Save individual JSON file for this claim
-            filename = f"jsonoutput/{claim_id}.json"
+            filename = f"output/{claim_id}.json"
             with open(filename, "w") as f:
                 json.dump(result_with_id, f, indent=2)
 
@@ -148,7 +148,7 @@ def process_batch_claims():
 
     # Save combined results to a single file with all claims
     timestamp = datetime.now().strftime("%d-%m-%Y_%I-%M-%S_%p")  # Format: DD-MM-YYYY_HH-MM-SS_AM/PM
-    combined_filename = f"jsonoutput/batch_results_{timestamp}.json"
+    combined_filename = f"output/batch_results_{timestamp}.json"
     with open(combined_filename, "w") as f:
         json.dump(results, f, indent=2)  # Save all results as a JSON array
 

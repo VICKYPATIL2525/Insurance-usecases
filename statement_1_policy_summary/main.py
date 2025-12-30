@@ -20,7 +20,7 @@ from langchain_openai import AzureChatOpenAI
 from langchain.messages import HumanMessage, SystemMessage
 
 # ---------------- Path ----------------
-path = r"uploads\health_insurance_document.pdf"   # fixed escape issue
+path = r"data\health_insurance_document.pdf"
 
 
 # ---------------- Extract PDF Text ----------------

@@ -7,10 +7,10 @@ from langchain_community.vectorstores import Chroma           # For storing and 
 
 # ---------------- CONFIG ----------------
 # Path to the folder containing PDF files to classify
-TEST_PDF_FOLDER = "statement_6_insurance_documents\\st_test_1"
+TEST_PDF_FOLDER = "data\\st_test_1"
 
 # Directory where the Chroma vector database is stored
-CHROMA_DB_PATH = "chroma_store"
+CHROMA_DB_PATH = "../shared/chroma_store"
 
 # Name of the collection in the vector database (contains reference documents)
 COLLECTION_NAME = "insurance_reference_docs"

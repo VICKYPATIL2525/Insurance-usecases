@@ -1,0 +1,132 @@
+[
+  {
+    "content": "Insurer: ABC Insurance\nPlan Name: Health Secure Plus\n\nPremium:\n- ₹18,000 per year for a family floater plan\n\nSum Insured:\n- ₹10 Lakhs shared across all insured family members\n\nDeductible:\n- ₹25,000 per claim (the policyholder must pay this amount before insurance coverage applies)\n\nCoverage Includes:\n- In-patient hospitalization expenses including room rent, doctor fees, medicines, and ICU charges\n- Day-care procedures such as chemotherapy, dialysis, and cataract surgery\n- Organ donor hospitalization expenses related to transplant\n- Pre- and post-hospitalization expenses\n\nExclusions:\n- OPD treatment\n- Dental treatment unless due to accident\n- Cosmetic procedures\n\nWaiting Periods:\n- Initial waiting period: 30 days\n- Pre-existing diseases: 48 months\n\nFamily Coverage:\n- Family floater covering up to 4 members",
+    "metadata": {
+      "insurer": "ABC Insurance",
+      "plan_name": "Health Secure Plus",
+      "premium": 18000,
+      "sum_insured_lakhs": 10,
+      "deductible": 25000,
+      "plan_type": "family_floater",
+      "max_family_members": 4,
+      "source": "insurance_quote"
+    }
+  },
+  {
+    "content": "Insurer: SecureLife Insurance\nPlan Name: Family Care Advantage\n\nPremium:\n- ₹22,500 per year\n\nSum Insured:\n- ₹15 Lakhs family floater\n\nDeductible:\n- No deductible\n\nCoverage Includes:\n- Hospitalization including ICU expenses\n- Day-care treatments\n- Emergency ambulance services\n- Annual health check-ups\n\nExclusions:\n- OPD expenses\n- Infertility treatments\n- Cosmetic surgery\n\nWaiting Periods:\n- Initial waiting period: 30 days\n- Pre-existing diseases: 36 months\n\nFamily Coverage:\n- Covers 2 adults and up to 3 children",
+    "metadata": {
+      "insurer": "SecureLife Insurance",
+      "plan_name": "Family Care Advantage",
+      "premium": 22500,
+      "sum_insured_lakhs": 15,
+      "deductible": 0,
+      "plan_type": "family_floater",
+      "max_family_members": 5,
+      "source": "insurance_quote"
+    }
+  },
+  {
+    "content": "Insurer: Prime Health Insurance\nPlan Name: Gold Family Shield\n\nPremium:\n- ₹28,000 per year\n\nSum Insured:\n- ₹20 Lakhs family floater\n\nDeductible:\n- No deductible\n\nCoverage Includes:\n- Hospitalization and ICU\n- Day-care procedures\n- Maternity and newborn cover\n- Organ donor expenses\n\nExclusions:\n- Cosmetic procedures\n- Non-allopathic treatment\n\nWaiting Periods:\n- Initial waiting period: 30 days\n- Pre-existing diseases: 24 months\n- Maternity: 24 months\n\nFamily Coverage:\n- Family floater for up to 4 members",
+    "metadata": {
+      "insurer": "Prime Health Insurance",
+      "plan_name": "Gold Family Shield",
+      "premium": 28000,
+      "sum_insured_lakhs": 20,
+      "deductible": 0,
+      "plan_type": "family_floater",
+      "max_family_members": 4,
+      "source": "insurance_quote"
+    }
+  },
+  {
+    "content": "Insurer: TrustHealth Insurance\nPlan Name: Family Secure Max\n\nPremium:\n- ₹25,000 per year\n\nSum Insured:\n- ₹15 Lakhs family floater\n\nDeductible:\n- ₹15,000 per claim\n\nCoverage Includes:\n- Hospitalization and ICU\n- Day-care procedures\n- Organ donor expenses\n- Domiciliary treatment\n\nExclusions:\n- OPD treatment\n- Cosmetic and dental procedures\n\nWaiting Periods:\n- Initial waiting period: 30 days\n- Pre-existing diseases: 36 months\n\nFamily Coverage:\n- Covers 2 adults and 2 children",
+    "metadata": {
+      "insurer": "TrustHealth Insurance",
+      "plan_name": "Family Secure Max",
+      "premium": 25000,
+      "sum_insured_lakhs": 15,
+      "deductible": 15000,
+      "plan_type": "family_floater",
+      "max_family_members": 4,
+      "source": "insurance_quote"
+    }
+  },
+  {
+    "content": "Insurer: HealthTrust Insurance\nPlan Name: Complete Care Family\n\nPremium:\n- ₹30,000 per year\n\nSum Insured:\n- ₹20 Lakhs family floater\n\nDeductible:\n- No deductible\n\nCoverage Includes:\n- Hospitalization and ICU\n- Day-care procedures\n- Maternity and newborn cover\n- Organ donor expenses\n- Domiciliary hospitalization\n\nExclusions:\n- Cosmetic procedures\n- Non-allopathic treatment\n\nWaiting Periods:\n- Initial waiting period: 30 days\n- Pre-existing diseases: 24 months\n- Maternity: 24 months\n\nFamily Coverage:\n- Family floater for up to 4 members",
+    "metadata": {
+      "insurer": "HealthTrust Insurance",
+      "plan_name": "Complete Care Family",
+      "premium": 30000,
+      "sum_insured_lakhs": 20,
+      "deductible": 0,
+      "plan_type": "family_floater",
+      "max_family_members": 4,
+      "source": "insurance_quote"
+    }
+  },
+  {
+    "content": "Insurer: WellCare Insurance\nPlan Name: Health Plus Saver\n\nPremium:\n- ₹16,500 per year for family floater\n\nSum Insured:\n- ₹8 Lakhs shared across insured members\n\nDeductible:\n- ₹20,000 per claim\n\nCoverage Includes:\n- In-patient hospitalization including room rent and ICU charges\n- Day-care procedures such as minor surgeries\n- Emergency ambulance services\n- Pre-hospitalization diagnostic expenses\n\nExclusions:\n- OPD consultations and routine check-ups\n- Dental and vision treatments\n- Cosmetic procedures\n\nWaiting Periods:\n- Initial waiting period: 30 days\n- Pre-existing diseases: 48 months\n\nFamily Coverage:\n- Family floater covering up to 3 members",
+    "metadata": {
+      "insurer": "WellCare Insurance",
+      "plan_name": "Health Plus Saver",
+      "premium": 16500,
+      "sum_insured_lakhs": 8,
+      "deductible": 20000,
+      "plan_type": "family_floater",
+      "max_family_members": 3,
+      "source": "insurance_quote"
+    }
+  },
+  {
+    "content": "Insurer: SafeHands Insurance\nPlan Name: Family Health Standard\n\nPremium:\n- ₹19,500 per year\n\nSum Insured:\n- ₹10 Lakhs family floater\n\nDeductible:\n- ₹10,000 per claim\n\nCoverage Includes:\n- Hospitalization expenses including ICU and specialist fees\n- Day-care procedures\n- Ambulance services up to policy limits\n- Post-hospitalization follow-up treatment\n\nExclusions:\n- OPD treatment and pharmacy expenses\n- Dental treatment unless accidental\n- Mental illness-related treatments\n\nWaiting Periods:\n- Initial waiting period: 30 days\n- Pre-existing diseases: 36 months\n\nFamily Coverage:\n- Covers up to 2 adults and 2 children",
+    "metadata": {
+      "insurer": "SafeHands Insurance",
+      "plan_name": "Family Health Standard",
+      "premium": 19500,
+      "sum_insured_lakhs": 10,
+      "deductible": 10000,
+      "plan_type": "family_floater",
+      "max_family_members": 4,
+      "source": "insurance_quote"
+    }
+  },
+  {
+    "content": "Insurer: LifeGuard Insurance\nPlan Name: Premium Health Elite\n\nPremium:\n- ₹35,000 per year\n\nSum Insured:\n- ₹25 Lakhs family floater\n\nDeductible:\n- No deductible\n\nCoverage Includes:\n- Hospitalization including ICU and critical care\n- Advanced day-care procedures\n- Organ transplant including donor expenses\n- Annual health check-ups\n- Emergency and air ambulance services\n\nExclusions:\n- Experimental or unproven treatments\n- Cosmetic procedures\n- Treatment outside India\n\nWaiting Periods:\n- Initial waiting period: 30 days\n- Pre-existing diseases: 24 months\n\nFamily Coverage:\n- Family floater covering up to 5 members",
+    "metadata": {
+      "insurer": "LifeGuard Insurance",
+      "plan_name": "Premium Health Elite",
+      "premium": 35000,
+      "sum_insured_lakhs": 25,
+      "deductible": 0,
+      "plan_type": "family_floater",
+      "max_family_members": 5,
+      "source": "insurance_quote"
+    }
+  },
+  {
+    "content": "Insurer: ShieldCare Insurance\nPlan Name: Smart Health Advantage\n\nPremium:\n- ₹21,000 per year\n\nSum Insured:\n- ₹12 Lakhs family floater\n\nDeductible:\n- ₹15,000 per claim\n\nCoverage Includes:\n- Hospitalization and ICU expenses\n- Advanced day-care procedures\n- Domiciliary treatment when hospitalization is not possible\n- Pre- and post-hospitalization expenses\n\nExclusions:\n- OPD consultations\n- Dental and cosmetic procedures\n- Infertility treatments\n\nWaiting Periods:\n- Initial waiting period: 30 days\n- Pre-existing diseases: 36 months\n\nFamily Coverage:\n- Covers up to 4 family members",
+    "metadata": {
+      "insurer": "ShieldCare Insurance",
+      "plan_name": "Smart Health Advantage",
+      "premium": 21000,
+      "sum_insured_lakhs": 12,
+      "deductible": 15000,
+      "plan_type": "family_floater",
+      "max_family_members": 4,
+      "source": "insurance_quote"
+    }
+  },
+  {
+    "content": "Insurer: PrimeSecure Insurance\nPlan Name: Total Family Care\n\nPremium:\n- ₹27,500 per year\n\nSum Insured:\n- ₹18 Lakhs family floater\n\nDeductible:\n- No deductible\n\nCoverage Includes:\n- Hospitalization including ICU and specialist treatment\n- Day-care and minimally invasive procedures\n- Maternity and newborn baby coverage\n- Organ donor hospitalization expenses\n- Emergency ambulance services\n\nExclusions:\n- Cosmetic treatments not medically required\n- Non-allopathic treatments\n- OPD consultations\n\nWaiting Periods:\n- Initial waiting period: 30 days\n- Pre-existing diseases: 24 months\n- Maternity: 24 months\n\nFamily Coverage:\n- Family floater for up to 4 members",
+    "metadata": {
+      "insurer": "PrimeSecure Insurance",
+      "plan_name": "Total Family Care",
+      "premium": 27500,
+      "sum_insured_lakhs": 18,
+      "deductible": 0,
+      "plan_type": "family_floater",
+      "max_family_members": 4,
+      "source": "insurance_quote"
+    }
+  }
+]

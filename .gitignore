@@ -1,0 +1,4 @@
+.env
+timetest.py
+chroma_store/
+myenv/

@@ -1,0 +1,54 @@
+# ========================================
+# Python Requirements File
+# Project: Insurance GenAI Solutions
+# Updated: December 2025
+# ========================================
+#
+# This file contains ONLY the top-level dependencies required by your project.
+# Transitive dependencies (packages that get installed automatically) are excluded.
+# ========================================
+
+# -------------------- Core Dependencies --------------------
+python-dotenv==1.0.0         # Environment variable management
+
+# -------------------- LangChain Ecosystem --------------------
+langchain==1.2.0             # Main LangChain package (includes langchain-core)
+langchain-community==0.4.1   # Community integrations (document loaders, vector stores)
+langchain-openai==1.1.6      # Azure OpenAI integration
+langchain-huggingface==1.2.0 # HuggingFace embeddings integration
+langchain-text-splitters==1.1.0  # Text chunking utilities
+
+# -------------------- PDF Processing --------------------
+pypdf==6.5.0                 # PDF reader (used by PyPDFLoader in langchain)
+
+# -------------------- Vector Database --------------------
+chromadb==1.4.0              # Vector store for embeddings
+
+# -------------------- Machine Learning / Embeddings --------------------
+sentence-transformers==5.2.0 # Transformer-based sentence embeddings (includes torch, transformers)
+
+# -------------------- Data Validation --------------------
+pydantic==2.12.5             # Data validation for structured outputs
+
+# ========================================
+# NOTES:
+# ========================================
+#
+# Removed packages (not used in your code):
+# - PyPDF2 (replaced by pypdf)
+# - pdfminer.six (not imported anywhere)
+# - docx2txt (not imported anywhere)
+# - unstructured (not imported anywhere)
+# - pi-heif (not imported anywhere)
+#
+# Transitive dependencies (auto-installed, not listed):
+# - numpy, pandas, scipy (from sentence-transformers)
+# - torch, torchvision (from sentence-transformers)
+# - transformers, tokenizers (from sentence-transformers)
+# - huggingface-hub (from langchain-huggingface)
+# - openai (from langchain-openai)
+# - requests, aiohttp (from various packages)
+# - All other support packages shown in pip freeze
+#
+# To install: pip install -r requirements.txt
+# ========================================

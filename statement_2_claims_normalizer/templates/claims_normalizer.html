@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claims Description Normalizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            color: #11998e;
+        }
+
+        .tab.active {
+            color: #11998e;
+            border-bottom-color: #11998e;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Single Claim Tab */
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .claim-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 15px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .claim-textarea:focus {
+            outline: none;
+            border-color: #11998e;
+        }
+
+        .process-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .process-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(17, 153, 142, 0.4);
+        }
+
+        .process-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Batch Processing Tab */
+        .upload-section {
+            background: #f8f9fa;
+            border: 2px dashed #11998e;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #38ef7d;
+            background: #f0fff8;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.4);
+        }
+
+        .file-name {
+            margin-top: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .csv-info {
+            background: #e8f5f3;
+            border-left: 4px solid #11998e;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .csv-info strong {
+            color: #11998e;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #11998e;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #11998e;
+            font-weight: 600;
+        }
+
+        /* Results */
+        .result-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            border-left: 4px solid #11998e;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .result-box h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #11998e;
+        }
+
+        .result-value.null {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Batch Results Table */
+        .batch-results {
+            margin-top: 20px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-table th {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .results-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .results-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .results-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #11998e;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: #fee;
+            border-left: 4px solid #f00;
+            padding: 15px;
+            border-radius: 5px;
+            color: #c00;
+            margin-top: 20px;
+            display: none;
+        }
+
+        /* Success Message */
+        .success-message {
+            background: #e8f5f3;
+            border-left: 4px solid #11998e;
+            padding: 15px;
+            border-radius: 5px;
+            color: #11998e;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Claims Description Normalizer</h1>
+        <p class="subtitle">Convert raw claim notes into structured data using AI</p>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('single')">Single Claim</button>
+            <button class="tab" onclick="switchTab('batch')">Batch Processing</button>
+        </div>
+
+        <!-- Single Claim Tab -->
+        <div id="singleTab" class="tab-content active">
+            <div class="input-section">
+                <label class="input-label">Enter Claim Description:</label>
+                <textarea
+                    id="claimText"
+                    class="claim-textarea"
+                    placeholder="Example: Was driving home last night, heavy rain, car skidded and hit the divider. Front bumper damaged badly, airbags deployed. Driver safe."
+                ></textarea>
+            </div>
+
+            <button class="process-btn" onclick="normalizeSingleClaim()">
+                Normalize Claim
+            </button>
+
+            <div class="loading" id="singleLoading">
+                <div class="spinner"></div>
+                <div class="loading-text">Processing claim...</div>
+            </div>
+
+            <div class="error-message" id="singleError"></div>
+            <div class="success-message" id="singleSuccess"></div>
+
+            <div class="result-section" id="singleResult">
+                <div class="result-box">
+                    <h2>Extracted Data</h2>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-label">Loss Type</div>
+                            <div class="result-value" id="lossType">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Severity</div>
+                            <div class="result-value" id="severity">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Affected Asset</div>
+                            <div class="result-value" id="affectedAsset">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Batch Processing Tab -->
+        <div id="batchTab" class="tab-content">
+            <div class="csv-info">
+                <strong>CSV Format Required:</strong> Your CSV file must contain two columns:
+                <code>claim_id</code> and <code>claim_text</code>
+            </div>
+
+            <div class="upload-section">
+                <div class="upload-icon">📊</div>
+                <div class="file-input-wrapper">
+                    <input type="file" id="csvFile" accept=".csv" onchange="handleFileSelect(event)">
+                    <label for="csvFile" class="file-input-label">Choose CSV File</label>
+                </div>
+                <div class="file-name" id="fileName">No file selected</div>
+            </div>
+
+            <button class="process-btn" id="batchBtn" onclick="normalizeBatchClaims()" disabled>
+                Process Batch
+            </button>
+
+            <div class="loading" id="batchLoading">
+                <div class="spinner"></div>
+                <div class="loading-text">Processing claims batch...</div>
+            </div>
+
+            <div class="error-message" id="batchError"></div>
+            <div class="success-message" id="batchSuccess"></div>
+
+            <div class="result-section" id="batchResult">
+                <div class="result-box">
+                    <h2>Batch Processing Summary</h2>
+                    <div class="stats-summary">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalClaims">0</div>
+                            <div class="stat-label">Total Claims</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="processedClaims">0</div>
+                            <div class="stat-label">Processed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="errorCount">0</div>
+                            <div class="stat-label">Errors</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="batch-results">
+                    <h2>Detailed Results</h2>
+                    <div style="overflow-x: auto;">
+                        <table class="results-table" id="resultsTable">
+                            <thead>
+                                <tr>
+                                    <th>Claim ID</th>
+                                    <th>Loss Type</th>
+                                    <th>Severity</th>
+                                    <th>Affected Asset</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tabName === 'single') {
+                document.getElementById('singleTab').classList.add('active');
+            } else {
+                document.getElementById('batchTab').classList.add('active');
+            }
+
+            // Hide all results and errors
+            hideAllMessages();
+        }
+
+        function hideAllMessages() {
+            document.getElementById('singleResult').style.display = 'none';
+            document.getElementById('batchResult').style.display = 'none';
+            document.getElementById('singleError').style.display = 'none';
+            document.getElementById('batchError').style.display = 'none';
+            document.getElementById('singleSuccess').style.display = 'none';
+            document.getElementById('batchSuccess').style.display = 'none';
+        }
+
+        // Single claim processing
+        async function normalizeSingleClaim() {
+            const claimText = document.getElementById('claimText').value.trim();
+            const loading = document.getElementById('singleLoading');
+            const errorDiv = document.getElementById('singleError');
+            const successDiv = document.getElementById('singleSuccess');
+            const resultDiv = document.getElementById('singleResult');
+
+            if (!claimText) {
+                errorDiv.textContent = 'Please enter a claim description';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Hide previous messages
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            resultDiv.style.display = 'none';
+
+            // Show loading
+            loading.style.display = 'block';
+
+            try {
+                const response = await fetch('/normalize-single', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ claim_text: claimText })
+                });
+
+                const result = await response.json();
+
+                loading.style.display = 'none';
+
+                if (result.success) {
+                    // Display results
+                    displayValue('lossType', result.data.loss_type);
+                    displayValue('severity', result.data.severity);
+                    displayValue('affectedAsset', result.data.affected_asset);
+
+                    resultDiv.style.display = 'block';
+                    successDiv.textContent = `Results saved to: ${result.saved_to}`;
+                    successDiv.style.display = 'block';
+                } else {
+                    errorDiv.textContent = 'Error: ' + result.error;
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                errorDiv.textContent = 'Error: Failed to process claim. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function displayValue(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (value === null || value === undefined || value === '') {
+                element.textContent = 'Not detected';
+                element.classList.add('null');
+            } else {
+                element.textContent = value;
+                element.classList.remove('null');
+            }
+        }
+
+        // Batch processing
+        function handleFileSelect(event) {
+            selectedFile = event.target.files[0];
+            const fileNameDisplay = document.getElementById('fileName');
+            const batchBtn = document.getElementById('batchBtn');
+
+            if (selectedFile) {
+                fileNameDisplay.textContent = selectedFile.name;
+                batchBtn.disabled = false;
+            } else {
+                fileNameDisplay.textContent = 'No file selected';
+                batchBtn.disabled = true;
+            }
+        }
+
+        async function normalizeBatchClaims() {
+            if (!selectedFile) return;
+
+            const loading = document.getElementById('batchLoading');
+            const errorDiv = document.getElementById('batchError');
+            const successDiv = document.getElementById('batchSuccess');
+            const resultDiv = document.getElementById('batchResult');
+            const batchBtn = document.getElementById('batchBtn');
+
+            // Hide previous messages
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            resultDiv.style.display = 'none';
+
+            // Show loading
+            loading.style.display = 'block';
+            batchBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/normalize-batch', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                loading.style.display = 'none';
+                batchBtn.disabled = false;
+
+                if (result.success) {
+                    const data = result.data;
+
+                    // Display summary stats
+                    document.getElementById('totalClaims').textContent = data.total_claims;
+                    document.getElementById('processedClaims').textContent = data.processed;
+                    document.getElementById('errorCount').textContent = data.errors;
+
+                    // Display results table
+                    const tableBody = document.getElementById('resultsTableBody');
+                    tableBody.innerHTML = '';
+
+                    data.results.forEach(claim => {
+                        const row = tableBody.insertRow();
+                        row.insertCell(0).textContent = claim.claim_id;
+                        row.insertCell(1).textContent = claim.loss_type || 'Not detected';
+                        row.insertCell(2).textContent = claim.severity || 'Not detected';
+                        row.insertCell(3).textContent = claim.affected_asset || 'Not detected';
+                    });
+
+                    resultDiv.style.display = 'block';
+                    successDiv.textContent = `Batch processing complete! Results saved to: ${data.saved_to}`;
+                    successDiv.style.display = 'block';
+
+                    if (data.errors > 0) {
+                        successDiv.textContent += ` (${data.errors} error(s) occurred)`;
+                    }
+                } else {
+                    errorDiv.textContent = 'Error: ' + result.error;
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                batchBtn.disabled = false;
+                errorDiv.textContent = 'Error: Failed to process batch. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

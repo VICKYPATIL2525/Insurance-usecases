@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Classifier</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            color: #4facfe;
+        }
+
+        .tab.active {
+            color: #4facfe;
+            border-bottom-color: #4facfe;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            border: 2px dashed #4facfe;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #00f2fe;
+            background: #f0fbff;
+        }
+
+        .upload-section.dragover {
+            border-color: #00f2fe;
+            background: #f0fbff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .file-name {
+            margin-top: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .files-list {
+            margin-top: 20px;
+            text-align: left;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            background: white;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .file-item-name {
+            color: #333;
+            font-size: 14px;
+        }
+
+        .file-item-remove {
+            background: #fee;
+            color: #f00;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .file-item-remove:hover {
+            background: #fcc;
+        }
+
+        .classify-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .classify-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(79, 172, 254, 0.4);
+        }
+
+        .classify-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .info-box {
+            background: #f0fbff;
+            border-left: 4px solid #4facfe;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #4facfe;
+            font-weight: 600;
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            border-left: 4px solid #4facfe;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .result-box h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .classification-result {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .classification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .document-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .confidence-badge {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .confidence-badge.high {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .confidence-badge.medium {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        }
+
+        .confidence-badge.low {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .classified-as {
+            background: #f0fbff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .classified-as strong {
+            color: #4facfe;
+        }
+
+        .all-matches {
+            margin-top: 10px;
+        }
+
+        .all-matches h4 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .match-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        .match-item:last-child {
+            border-bottom: none;
+        }
+
+        .match-source {
+            color: #555;
+        }
+
+        .match-score {
+            color: #4facfe;
+            font-weight: 600;
+        }
+
+        .batch-results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .batch-results-table th {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .batch-results-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .batch-results-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .batch-results-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .error-message {
+            background: #fee;
+            border-left: 4px solid #f00;
+            padding: 15px;
+            border-radius: 5px;
+            color: #c00;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Document Classifier</h1>
+        <p class="subtitle">AI-powered document classification using embedding similarity</p>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('single')">Single Document</button>
+            <button class="tab" onclick="switchTab('batch')">Batch Classification</button>
+        </div>
+
+        <!-- Single Document Tab -->
+        <div id="singleTab" class="tab-content active">
+            <div class="info-box">
+                Upload a PDF document to classify it against reference documents in the database.
+            </div>
+
+            <div class="upload-section" id="singleDropZone">
+                <div class="upload-icon">📄</div>
+                <div class="file-input-wrapper">
+                    <input type="file" id="singleFile" accept=".pdf" onchange="handleSingleFileSelect(event)">
+                    <label for="singleFile" class="file-input-label">Choose PDF File</label>
+                </div>
+                <div class="file-name" id="singleFileName">No file selected</div>
+            </div>
+
+            <button class="classify-btn" id="singleClassifyBtn" onclick="classifySingle()" disabled>
+                Classify Document
+            </button>
+
+            <div class="loading" id="singleLoading">
+                <div class="spinner"></div>
+                <div class="loading-text">Classifying document...</div>
+            </div>
+
+            <div class="error-message" id="singleError"></div>
+
+            <div class="result-section" id="singleResult"></div>
+        </div>
+
+        <!-- Batch Classification Tab -->
+        <div id="batchTab" class="tab-content">
+            <div class="info-box">
+                Upload multiple PDF documents to classify them in batch.
+            </div>
+
+            <div class="upload-section" id="batchDropZone">
+                <div class="upload-icon">📁</div>
+                <div class="file-input-wrapper">
+                    <input type="file" id="batchFiles" accept=".pdf" multiple onchange="handleBatchFileSelect(event)">
+                    <label for="batchFiles" class="file-input-label">Choose PDF Files</label>
+                </div>
+                <p style="margin-top: 15px; color: #666; font-size: 14px;">or drag and drop files here</p>
+
+                <div class="files-list" id="batchFilesList"></div>
+            </div>
+
+            <button class="classify-btn" id="batchClassifyBtn" onclick="classifyBatch()" disabled>
+                Classify Batch
+            </button>
+
+            <div class="loading" id="batchLoading">
+                <div class="spinner"></div>
+                <div class="loading-text">Classifying documents...</div>
+            </div>
+
+            <div class="error-message" id="batchError"></div>
+
+            <div class="result-section" id="batchResult"></div>
+        </div>
+    </div>
+
+    <script>
+        let singleFile = null;
+        let batchFiles = [];
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tabName === 'single') {
+                document.getElementById('singleTab').classList.add('active');
+            } else {
+                document.getElementById('batchTab').classList.add('active');
+            }
+
+            hideAllMessages();
+        }
+
+        function hideAllMessages() {
+            document.getElementById('singleResult').style.display = 'none';
+            document.getElementById('batchResult').style.display = 'none';
+            document.getElementById('singleError').style.display = 'none';
+            document.getElementById('batchError').style.display = 'none';
+        }
+
+        // Single file handling
+        function handleSingleFileSelect(event) {
+            singleFile = event.target.files[0];
+            const fileNameDisplay = document.getElementById('singleFileName');
+            const classifyBtn = document.getElementById('singleClassifyBtn');
+
+            if (singleFile) {
+                fileNameDisplay.textContent = singleFile.name;
+                classifyBtn.disabled = false;
+            } else {
+                fileNameDisplay.textContent = 'No file selected';
+                classifyBtn.disabled = true;
+            }
+        }
+
+        async function classifySingle() {
+            if (!singleFile) return;
+
+            const loading = document.getElementById('singleLoading');
+            const errorDiv = document.getElementById('singleError');
+            const resultDiv = document.getElementById('singleResult');
+            const classifyBtn = document.getElementById('singleClassifyBtn');
+
+            errorDiv.style.display = 'none';
+            resultDiv.style.display = 'none';
+            loading.style.display = 'block';
+            classifyBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', singleFile);
+
+            try {
+                const response = await fetch('/classify-single', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                loading.style.display = 'none';
+
+                if (result.success) {
+                    displaySingleResult(result);
+                    resultDiv.style.display = 'block';
+                } else {
+                    errorDiv.textContent = 'Error: ' + result.error;
+                    errorDiv.style.display = 'block';
+                }
+
+                classifyBtn.disabled = false;
+            } catch (error) {
+                loading.style.display = 'none';
+                errorDiv.textContent = 'Error: Failed to classify document. Please try again.';
+                errorDiv.style.display = 'block';
+                classifyBtn.disabled = false;
+            }
+        }
+
+        function displaySingleResult(result) {
+            const data = result.data;
+            const confidence = data.confidence;
+            let confidenceClass = 'low';
+            if (confidence >= 80) confidenceClass = 'high';
+            else if (confidence >= 60) confidenceClass = 'medium';
+
+            const matchesHtml = data.all_matches.map(match => `
+                <div class="match-item">
+                    <span class="match-source">${match.source}</span>
+                    <span class="match-score">${match.similarity}%</span>
+                </div>
+            `).join('');
+
+            document.getElementById('singleResult').innerHTML = `
+                <div class="result-box">
+                    <h2>Classification Result</h2>
+                    <div class="classification-result">
+                        <div class="classification-header">
+                            <span class="document-name">${result.filename}</span>
+                            <span class="confidence-badge ${confidenceClass}">${confidence}% Confidence</span>
+                        </div>
+                        <div class="classified-as">
+                            <strong>Classified as:</strong> ${data.best_match}
+                        </div>
+                        <div class="all-matches">
+                            <h4>Top Matches:</h4>
+                            ${matchesHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Batch file handling
+        const batchDropZone = document.getElementById('batchDropZone');
+
+        batchDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            batchDropZone.classList.add('dragover');
+        });
+
+        batchDropZone.addEventListener('dragleave', () => {
+            batchDropZone.classList.remove('dragover');
+        });
+
+        batchDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            batchDropZone.classList.remove('dragover');
+
+            const files = Array.from(e.dataTransfer.files).filter(f => f.name.toLowerCase().endsWith('.pdf'));
+            if (files.length > 0) {
+                addBatchFiles(files);
+            }
+        });
+
+        function handleBatchFileSelect(event) {
+            const files = Array.from(event.target.files);
+            addBatchFiles(files);
+        }
+
+        function addBatchFiles(files) {
+            batchFiles = [...batchFiles, ...files];
+            updateBatchFilesList();
+            document.getElementById('batchClassifyBtn').disabled = batchFiles.length === 0;
+        }
+
+        function removeBatchFile(index) {
+            batchFiles.splice(index, 1);
+            updateBatchFilesList();
+            document.getElementById('batchClassifyBtn').disabled = batchFiles.length === 0;
+        }
+
+        function updateBatchFilesList() {
+            const filesList = document.getElementById('batchFilesList');
+
+            if (batchFiles.length === 0) {
+                filesList.innerHTML = '';
+                return;
+            }
+
+            filesList.innerHTML = batchFiles.map((file, index) => `
+                <div class="file-item">
+                    <span class="file-item-name">${file.name}</span>
+                    <button class="file-item-remove" onclick="removeBatchFile(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        async function classifyBatch() {
+            if (batchFiles.length === 0) return;
+
+            const loading = document.getElementById('batchLoading');
+            const errorDiv = document.getElementById('batchError');
+            const resultDiv = document.getElementById('batchResult');
+            const classifyBtn = document.getElementById('batchClassifyBtn');
+
+            errorDiv.style.display = 'none';
+            resultDiv.style.display = 'none';
+            loading.style.display = 'block';
+            classifyBtn.disabled = true;
+
+            const formData = new FormData();
+            batchFiles.forEach(file => {
+                formData.append('files', file);
+            });
+
+            try {
+                const response = await fetch('/classify-batch', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                loading.style.display = 'none';
+
+                if (result.success) {
+                    displayBatchResults(result);
+                    resultDiv.style.display = 'block';
+                } else {
+                    errorDiv.textContent = 'Error: ' + result.error;
+                    errorDiv.style.display = 'block';
+                }
+
+                classifyBtn.disabled = false;
+            } catch (error) {
+                loading.style.display = 'none';
+                errorDiv.textContent = 'Error: Failed to classify documents. Please try again.';
+                errorDiv.style.display = 'block';
+                classifyBtn.disabled = false;
+            }
+        }
+
+        function displayBatchResults(result) {
+            const tableRows = result.results.map(item => {
+                if (!item.success) {
+                    return `
+                        <tr>
+                            <td>${item.filename}</td>
+                            <td colspan="2" style="color: #c00;">Error: ${item.error}</td>
+                        </tr>
+                    `;
+                }
+
+                const confidence = item.confidence;
+                let confidenceClass = 'low';
+                if (confidence >= 80) confidenceClass = 'high';
+                else if (confidence >= 60) confidenceClass = 'medium';
+
+                return `
+                    <tr>
+                        <td>${item.filename}</td>
+                        <td>${item.best_match}</td>
+                        <td><span class="confidence-badge ${confidenceClass}">${confidence}%</span></td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('batchResult').innerHTML = `
+                <div class="result-box">
+                    <h2>Batch Classification Results (${result.total_files} documents)</h2>
+                    <table class="batch-results-table">
+                        <thead>
+                            <tr>
+                                <th>Filename</th>
+                                <th>Classified As</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

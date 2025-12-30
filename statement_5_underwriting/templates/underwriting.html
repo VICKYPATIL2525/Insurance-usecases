@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Underwriting Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            border: 2px dashed #f093fb;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #f5576c;
+            background: #fff5f8;
+        }
+
+        .upload-section.dragover {
+            border-color: #f5576c;
+            background: #fff5f8;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+        }
+
+        .files-list {
+            margin-top: 20px;
+            text-align: left;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            background: white;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .file-item-name {
+            color: #333;
+            font-size: 14px;
+        }
+
+        .file-item-remove {
+            background: #fee;
+            color: #f00;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .file-item-remove:hover {
+            background: #fcc;
+        }
+
+        .info-box {
+            background: #fff5f8;
+            border-left: 4px solid #f093fb;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .info-box strong {
+            color: #f5576c;
+        }
+
+        .analyze-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .analyze-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(240, 147, 251, 0.4);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #f093fb;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #f093fb;
+            font-weight: 600;
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .risk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .risk-score-box {
+            text-align: center;
+        }
+
+        .risk-score {
+            font-size: 48px;
+            font-weight: 700;
+        }
+
+        .risk-score-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .risk-level-box {
+            background: white;
+            color: #f5576c;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .risk-level-box.LOW {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .risk-level-box.MEDIUM {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .risk-level-box.HIGH {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            border-left: 4px solid #f093fb;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .result-box h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .result-box p {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .factors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .factors-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .factors-box h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .factors-box.risk h3 {
+            color: #f5576c;
+        }
+
+        .factors-box.positive h3 {
+            color: #28a745;
+        }
+
+        .factors-box ul {
+            list-style: none;
+        }
+
+        .factors-box li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            color: #555;
+        }
+
+        .factors-box li:last-child {
+            border-bottom: none;
+        }
+
+        .factors-box li:before {
+            content: "• ";
+            color: #f093fb;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 8px;
+        }
+
+        .factors-box.positive li:before {
+            color: #28a745;
+        }
+
+        .notes-box {
+            background: #fff5f8;
+            border: 2px solid #f093fb;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .notes-box h3 {
+            color: #f5576c;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .notes-box p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .error-message {
+            background: #fee;
+            border-left: 4px solid #f00;
+            padding: 15px;
+            border-radius: 5px;
+            color: #c00;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Underwriting Assistant</h1>
+        <p class="subtitle">AI-powered risk assessment from applicant documents</p>
+
+        <div class="info-box">
+            <strong>How it works:</strong> Upload multiple PDF documents (applicant data, claims history, verification reports) and our AI will analyze the risk profile.
+        </div>
+
+        <div class="upload-section" id="dropZone">
+            <div class="upload-icon">📄</div>
+            <div class="file-input-wrapper">
+                <input type="file" id="pdfFiles" accept=".pdf" multiple onchange="handleFileSelect(event)">
+                <label for="pdfFiles" class="file-input-label">Choose PDF Files</label>
+            </div>
+            <p style="margin-top: 15px; color: #666; font-size: 14px;">or drag and drop files here</p>
+
+            <div class="files-list" id="filesList"></div>
+        </div>
+
+        <button class="analyze-btn" id="analyzeBtn" onclick="analyzeRisk()" disabled>
+            Analyze Risk
+        </button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Analyzing underwriting documents...</div>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="result-section" id="resultSection">
+            <div class="risk-header">
+                <div class="risk-score-box">
+                    <div class="risk-score" id="riskScore">0</div>
+                    <div class="risk-score-label">Risk Score</div>
+                </div>
+                <div class="risk-level-box" id="riskLevel">UNKNOWN</div>
+            </div>
+
+            <div class="result-box">
+                <h2>Risk Summary</h2>
+                <p id="riskSummary"></p>
+            </div>
+
+            <div class="factors-grid">
+                <div class="factors-box risk">
+                    <h3>⚠️ Key Risk Factors</h3>
+                    <ul id="riskFactors"></ul>
+                </div>
+
+                <div class="factors-box positive">
+                    <h3>✅ Positive Indicators</h3>
+                    <ul id="positiveIndicators"></ul>
+                </div>
+            </div>
+
+            <div class="notes-box">
+                <h3>📋 Underwriter Notes</h3>
+                <p id="underwriterNotes"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFiles = [];
+
+        // Drag and drop functionality
+        const dropZone = document.getElementById('dropZone');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+
+            const files = Array.from(e.dataTransfer.files).filter(f => f.name.toLowerCase().endsWith('.pdf'));
+            if (files.length > 0) {
+                addFiles(files);
+            }
+        });
+
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            addFiles(files);
+        }
+
+        function addFiles(files) {
+            selectedFiles = [...selectedFiles, ...files];
+            updateFilesList();
+            document.getElementById('analyzeBtn').disabled = selectedFiles.length === 0;
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFilesList();
+            document.getElementById('analyzeBtn').disabled = selectedFiles.length === 0;
+        }
+
+        function updateFilesList() {
+            const filesList = document.getElementById('filesList');
+
+            if (selectedFiles.length === 0) {
+                filesList.innerHTML = '';
+                return;
+            }
+
+            filesList.innerHTML = selectedFiles.map((file, index) => `
+                <div class="file-item">
+                    <span class="file-item-name">${file.name}</span>
+                    <button class="file-item-remove" onclick="removeFile(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        async function analyzeRisk() {
+            if (selectedFiles.length === 0) return;
+
+            const loading = document.getElementById('loading');
+            const resultSection = document.getElementById('resultSection');
+            const errorMessage = document.getElementById('errorMessage');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+
+            // Hide previous results and errors
+            resultSection.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            // Show loading
+            loading.style.display = 'block';
+            analyzeBtn.disabled = true;
+
+            const formData = new FormData();
+            selectedFiles.forEach(file => {
+                formData.append('files', file);
+            });
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                loading.style.display = 'none';
+
+                if (result.success) {
+                    const data = result.data;
+
+                    // Display risk score and level
+                    document.getElementById('riskScore').textContent = data.risk_score;
+                    const riskLevelEl = document.getElementById('riskLevel');
+                    riskLevelEl.textContent = data.risk_level;
+                    riskLevelEl.className = `risk-level-box ${data.risk_level}`;
+
+                    // Display risk summary
+                    document.getElementById('riskSummary').textContent = data.risk_summary;
+
+                    // Display risk factors
+                    const riskFactorsList = document.getElementById('riskFactors');
+                    if (data.key_risk_factors && data.key_risk_factors.length > 0) {
+                        riskFactorsList.innerHTML = data.key_risk_factors.map(factor =>
+                            `<li>${factor}</li>`
+                        ).join('');
+                    } else {
+                        riskFactorsList.innerHTML = '<li>No risk factors identified</li>';
+                    }
+
+                    // Display positive indicators
+                    const positiveList = document.getElementById('positiveIndicators');
+                    if (data.positive_indicators && data.positive_indicators.length > 0) {
+                        positiveList.innerHTML = data.positive_indicators.map(indicator =>
+                            `<li>${indicator}</li>`
+                        ).join('');
+                    } else {
+                        positiveList.innerHTML = '<li>No positive indicators identified</li>';
+                    }
+
+                    // Display underwriter notes
+                    document.getElementById('underwriterNotes').textContent = data.underwriter_notes;
+
+                    resultSection.style.display = 'block';
+                } else {
+                    errorMessage.textContent = 'Error: ' + result.error;
+                    errorMessage.style.display = 'block';
+                }
+
+                analyzeBtn.disabled = false;
+
+            } catch (error) {
+                loading.style.display = 'none';
+                errorMessage.textContent = 'Error: Failed to analyze documents. Please try again.';
+                errorMessage.style.display = 'block';
+                analyzeBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

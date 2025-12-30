@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Comparison Chatbot</title>
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            height: 700px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .info-section {
+            background: #f0f2ff;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-section h3 {
+            color: #6B73FF;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .info-examples {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .example-chip {
+            background: white;
+            border: 1px solid #6B73FF;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #6B73FF;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example-chip:hover {
+            background: #6B73FF;
+            color: white;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 30px;
+            background: #fafafa;
+        }
+
+        .chat-message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-message.user {
+            justify-content: flex-end;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .message-avatar.bot {
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            color: white;
+        }
+
+        .message-avatar.user {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.6;
+        }
+
+        .message-content.bot {
+            background: white;
+            border: 1px solid #e0e0e0;
+            color: #333;
+        }
+
+        /* Markdown styling for bot messages */
+        .message-content.bot h1,
+        .message-content.bot h2,
+        .message-content.bot h3 {
+            color: #6B73FF;
+            margin: 12px 0 8px 0;
+        }
+
+        .message-content.bot h3 {
+            font-size: 16px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 4px;
+        }
+
+        .message-content.bot table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .message-content.bot table th {
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            color: white;
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .message-content.bot table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e0e0e0;
+            background: #fafafa;
+        }
+
+        .message-content.bot table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .message-content.bot table tr:hover td {
+            background: #f0f2ff;
+        }
+
+        .message-content.bot ul,
+        .message-content.bot ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+
+        .message-content.bot li {
+            margin: 5px 0;
+        }
+
+        .message-content.bot strong {
+            color: #6B73FF;
+            font-weight: 600;
+        }
+
+        .message-content.bot p {
+            margin: 8px 0;
+        }
+
+        .message-content.bot code {
+            background: #f0f2ff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .message-content.user {
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            color: white;
+        }
+
+        .welcome-message {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+
+        .welcome-message h2 {
+            color: #6B73FF;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .welcome-message p {
+            margin-bottom: 10px;
+        }
+
+        .input-section {
+            padding: 20px 30px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-family: inherit;
+            font-size: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #6B73FF;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(107, 115, 255, 0.4);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .reset-btn {
+            background: #f0f0f0;
+            color: #666;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .typing-indicator .message-avatar {
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            color: white;
+        }
+
+        .typing-dots {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 12px 16px;
+            border-radius: 12px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #6B73FF;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .error-message {
+            background: #fee;
+            border-left: 4px solid #f00;
+            padding: 12px;
+            border-radius: 8px;
+            color: #c00;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Insurance Quote Comparison</h1>
+            <p>Compare multiple insurance quotes and get expert recommendations</p>
+        </div>
+
+        <div class="info-section">
+            <h3>Try these examples:</h3>
+            <div class="info-examples">
+                <div class="example-chip" onclick="useExample('compare 18000, 22500, 28000')">compare 18000, 22500, 28000</div>
+                <div class="example-chip" onclick="useExample('18000 vs 22500')">18000 vs 22500</div>
+                <div class="example-chip" onclick="useExample('compare plans 20000 and 25000 for family of 4')">for family of 4?</div>
+            </div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="welcome-message">
+                <h2>Welcome!</h2>
+                <p><strong>How to use:</strong></p>
+                <p>1. Provide 2-3 premium amounts to compare</p>
+                <p>2. Ask follow-up questions about the results</p>
+                <p><br><strong>Example:</strong><br>
+                "compare 18000, 22500, 28000"<br>
+                Then ask: "which one has no deductible?"</p>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="message-avatar bot">🤖</div>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <div class="input-section">
+            <div class="input-container">
+                <button class="reset-btn" onclick="resetConversation()">New Chat</button>
+                <input
+                    type="text"
+                    id="messageInput"
+                    class="message-input"
+                    placeholder="Type your question... (e.g., compare 18000, 22500, 28000)"
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let conversationStarted = false;
+
+        function useExample(text) {
+            document.getElementById('messageInput').value = text;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            const sendBtn = document.getElementById('sendBtn');
+            const chatContainer = document.getElementById('chatContainer');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const errorDiv = document.getElementById('errorMessage');
+            const welcomeMsg = document.querySelector('.welcome-message');
+
+            // Hide welcome message and errors
+            if (welcomeMsg) welcomeMsg.style.display = 'none';
+            errorDiv.style.display = 'none';
+            conversationStarted = true;
+
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+            sendBtn.disabled = true;
+            input.disabled = true;
+
+            // Show typing indicator
+            typingIndicator.style.display = 'flex';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const result = await response.json();
+
+                typingIndicator.style.display = 'none';
+
+                if (result.success) {
+                    addMessage(result.response, 'bot');
+                } else {
+                    errorDiv.textContent = 'Error: ' + result.error;
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                typingIndicator.style.display = 'none';
+                errorDiv.textContent = 'Error: Failed to send message. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+
+            sendBtn.disabled = false;
+            input.disabled = false;
+            input.focus();
+        }
+
+        function addMessage(text, type) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${type}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = `message-avatar ${type}`;
+            avatar.textContent = type === 'bot' ? '🤖' : '👤';
+
+            const content = document.createElement('div');
+            content.className = `message-content ${type}`;
+
+            // For bot messages, render markdown as HTML
+            if (type === 'bot') {
+                // Configure marked to render tables properly
+                marked.setOptions({
+                    breaks: true,
+                    gfm: true
+                });
+                content.innerHTML = marked.parse(text);
+            } else {
+                // For user messages, just use plain text
+                content.textContent = text;
+            }
+
+            if (type === 'user') {
+                messageDiv.appendChild(content);
+                messageDiv.appendChild(avatar);
+            } else {
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(content);
+            }
+
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function resetConversation() {
+            if (!conversationStarted && !confirm('Start a new conversation?')) {
+                return;
+            }
+
+            if (conversationStarted && !confirm('Reset the conversation? All history will be lost.')) {
+                return;
+            }
+
+            try {
+                await fetch('/reset', {
+                    method: 'POST'
+                });
+
+                // Clear chat
+                const chatContainer = document.getElementById('chatContainer');
+                chatContainer.innerHTML = `
+                    <div class="welcome-message">
+                        <h2>Welcome!</h2>
+                        <p><strong>How to use:</strong></p>
+                        <p>1. Provide 2-3 premium amounts to compare</p>
+                        <p>2. Ask follow-up questions about the results</p>
+                        <p><br><strong>Example:</strong><br>
+                        "compare 18000, 22500, 28000"<br>
+                        Then ask: "which one has no deductible?"</p>
+                    </div>
+                    <div class="typing-indicator" id="typingIndicator">
+                        <div class="message-avatar bot">🤖</div>
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                    <div class="error-message" id="errorMessage"></div>
+                `;
+
+                conversationStarted = false;
+                document.getElementById('messageInput').value = '';
+            } catch (error) {
+                alert('Failed to reset conversation. Please refresh the page.');
+            }
+        }
+    </script>
+</body>
+</html>

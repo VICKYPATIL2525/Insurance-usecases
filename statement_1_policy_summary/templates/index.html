@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Policy Summary Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            border: 2px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #764ba2;
+            background: #f0f1ff;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .file-name {
+            margin-top: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .summarize-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .summarize-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .summarize-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: #f0f0f0;
+            border-radius: 25px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            height: 30px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 25px;
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .progress-text {
+            margin-top: 10px;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .summary-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .summary-box h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .summary-content {
+            color: #555;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .error-message {
+            background: #fee;
+            border-left: 4px solid #f00;
+            padding: 15px;
+            border-radius: 5px;
+            color: #c00;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Policy Summary Assistant</h1>
+        <p class="subtitle">Upload your insurance policy PDF and get an instant AI-powered summary</p>
+
+        <div class="upload-section">
+            <div class="upload-icon">📄</div>
+            <div class="file-input-wrapper">
+                <input type="file" id="pdfFile" accept=".pdf" onchange="handleFileSelect(event)">
+                <label for="pdfFile" class="file-input-label">Choose PDF File</label>
+            </div>
+            <div class="file-name" id="fileName">No file selected</div>
+        </div>
+
+        <button class="summarize-btn" id="summarizeBtn" onclick="summarizePolicy()" disabled>
+            Summarize Policy
+        </button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+            <div class="progress-text" id="progressText">Initializing...</div>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="result-section" id="resultSection">
+            <div class="summary-box">
+                <h2>Policy Summary</h2>
+                <div class="summary-content" id="summaryContent"></div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalChunks">0</div>
+                    <div class="stat-label">Chunks Processed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="charsProcessed">0</div>
+                    <div class="stat-label">Characters Analyzed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="reductionPercent">0%</div>
+                    <div class="stat-label">Text Reduction</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+
+        function handleFileSelect(event) {
+            selectedFile = event.target.files[0];
+            const fileNameDisplay = document.getElementById('fileName');
+            const summarizeBtn = document.getElementById('summarizeBtn');
+
+            if (selectedFile) {
+                fileNameDisplay.textContent = selectedFile.name;
+                summarizeBtn.disabled = false;
+            } else {
+                fileNameDisplay.textContent = 'No file selected';
+                summarizeBtn.disabled = true;
+            }
+        }
+
+        async function summarizePolicy() {
+            if (!selectedFile) return;
+
+            const loading = document.getElementById('loading');
+            const resultSection = document.getElementById('resultSection');
+            const errorMessage = document.getElementById('errorMessage');
+            const summarizeBtn = document.getElementById('summarizeBtn');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+
+            // Hide previous results and errors
+            resultSection.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            // Show loading
+            loading.style.display = 'block';
+            summarizeBtn.disabled = true;
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+            progressText.textContent = 'Uploading file...';
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                // Upload file and get task ID
+                const uploadResponse = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const uploadData = await uploadResponse.json();
+
+                if (!uploadData.success) {
+                    errorMessage.textContent = 'Error: ' + uploadData.error;
+                    errorMessage.style.display = 'block';
+                    loading.style.display = 'none';
+                    summarizeBtn.disabled = false;
+                    return;
+                }
+
+                // Connect to progress stream
+                const taskId = uploadData.task_id;
+                const eventSource = new EventSource(`/progress/${taskId}`);
+
+                eventSource.onmessage = function(event) {
+                    const message = JSON.parse(event.data);
+
+                    if (message.type === 'progress') {
+                        const progress = message.data;
+                        const percent = progress.percent || 0;
+
+                        progressBar.style.width = percent + '%';
+                        progressBar.textContent = percent + '%';
+
+                        // Update text based on stage - simplified
+                        if (progress.stage === 'extract' || progress.stage === 'preprocess' || progress.stage === 'chunking') {
+                            progressText.textContent = 'Processing document...';
+                        } else if (progress.stage === 'chunks') {
+                            progressText.textContent = 'Processing document...';
+                        } else if (progress.stage === 'final') {
+                            progressText.textContent = 'Generating summary...';
+                        }
+                    } else if (message.type === 'complete') {
+                        eventSource.close();
+                        const result = message.result;
+
+                        if (result.success) {
+                            // Display results
+                            document.getElementById('summaryContent').textContent = result.data.summary;
+                            document.getElementById('totalChunks').textContent = result.data.total_chunks;
+                            document.getElementById('charsProcessed').textContent = result.data.preprocessing_stats.cleaned_characters.toLocaleString();
+                            document.getElementById('reductionPercent').textContent = result.data.preprocessing_stats.reduction_percent + '%';
+
+                            resultSection.style.display = 'block';
+                            loading.style.display = 'none';
+                        } else {
+                            errorMessage.textContent = 'Error: ' + result.error;
+                            errorMessage.style.display = 'block';
+                            loading.style.display = 'none';
+                        }
+
+                        summarizeBtn.disabled = false;
+                    }
+                };
+
+                eventSource.onerror = function() {
+                    eventSource.close();
+                    errorMessage.textContent = 'Error: Connection lost. Please try again.';
+                    errorMessage.style.display = 'block';
+                    loading.style.display = 'none';
+                    summarizeBtn.disabled = false;
+                };
+
+            } catch (error) {
+                errorMessage.textContent = 'Error: Failed to process the file. Please try again.';
+                errorMessage.style.display = 'block';
+                loading.style.display = 'none';
+                summarizeBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

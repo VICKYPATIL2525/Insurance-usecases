@@ -4,27 +4,42 @@
 Develop an AI model that converts raw claim notes (free-text from adjusters or customers) into structured data—detecting loss type, severity, and affected asset.
 
 ## Files
-- `statement_2.py` - Single claim processing
-- `statement_2_batch.py` - Batch processing from CSV file
+- `main_single_processing.py` - Single claim processing
+- `main_batch_processing.py` - Batch processing from CSV file
+- `app.py` - Flask web UI for interactive claim normalization
+- `data/statement_2_claims.csv` - Sample claims data (19 claims)
+- `templates/claims_normalizer.html` - Web interface HTML
+- `output/` - Folder for generated JSON files
+- `uploads/` - Folder for user-uploaded CSV files (web UI)
 
 ## Data Files
-- `data/statement_2_claims.csv` - Sample claims data for batch processing
-
-## Output
-- `output/` - JSON files with structured claim data
+- `data/statement_2_claims.csv` - Contains 19 sample insurance claims with free-text descriptions
 
 ## How to Run
-### Single Claim
-```bash
-python statement_2.py
-```
 
-### Batch Processing
+### CLI Version - Single Claim
 ```bash
-python statement_2_batch.py
+python main_single_processing.py
+```
+Enter a claim description when prompted, and get structured JSON output.
+
+### CLI Version - Batch Processing
+```bash
+python main_batch_processing.py
+```
+Processes all claims from `data/statement_2_claims.csv` and saves JSON files to `output/` folder.
+
+### Web UI Version
+```bash
+# Start Flask web server
+python app.py
+
+# Then open your browser to http://localhost:5001
+# Enter claims manually or upload CSV files
 ```
 
 ## Output Format
+The system extracts structured data using Pydantic schema:
 ```json
 {
   "loss_type": "Accident",
@@ -32,3 +47,9 @@ python statement_2_batch.py
   "affected_asset": "Vehicle"
 }
 ```
+
+## Technologies Used
+- **LangChain**: LLM orchestration
+- **Azure OpenAI GPT-4**: Text understanding and extraction
+- **Pydantic**: Structured output validation (ClaimSchema)
+- **Flask**: Web interface (for app.py)

@@ -20,7 +20,11 @@ load_dotenv()
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 # Setup: Vector database stores insurance plans and retrieves them by premium amount
-vector_db = Chroma(persist_directory="../shared/chroma_store", embedding_function=embeddings)
+vector_db = Chroma(
+    persist_directory="../shared/chroma_store",
+    embedding_function=embeddings,
+    collection_name="insurance_quotes"
+)
 
 # LLM1: Classifies user input (NEW comparison / FOLLOW_UP question / INVALID)
 llm1 = AzureChatOpenAI(

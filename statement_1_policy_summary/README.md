@@ -4,22 +4,50 @@
 Build a GenAI tool that can read lengthy insurance policy documents and generate a concise, plain-language summary of coverage, exclusions, and limits.
 
 ## Files
-- `statement_1.py` - Original implementation
-- `statement_1_optimized.py` - Optimized version with parallel batch processing (3-5x faster)
+- `main.py` - Original implementation
+- `main_optimized.py` - Optimized version with parallel batch processing (3-5x faster)
+- `app.py` - Flask web UI for uploading and summarizing PDFs
+- `data/health_insurance_document.pdf` - Sample insurance policy document (172 KB)
+- `templates/index.html` - Web interface HTML
+- `uploads/` - Folder for user-uploaded PDFs (web UI)
 
-## Required Data
-**IMPORTANT**: You need to add the insurance policy PDF file:
-- Create a file named `health_insurance_document.pdf` in the `data/` folder
-- The PDF should contain an insurance policy document to summarize
+## Data Files
+A sample insurance policy PDF is included:
+- `data/health_insurance_document.pdf` - Sample health insurance policy document
+
+You can also use your own PDF files by:
+- Replacing the sample PDF in the `data/` folder, OR
+- Using the web UI to upload your own PDF
 
 ## How to Run
-1. Place your insurance policy PDF in `data/health_insurance_document.pdf`
-2. Run: `python statement_1.py` (original version)
-   OR
-   Run: `python statement_1_optimized.py` (faster version)
+
+### CLI Version
+```bash
+# Original version
+python main.py
+
+# Optimized version (3-5x faster with parallel processing)
+python main_optimized.py
+```
+
+### Web UI Version
+```bash
+# Start Flask web server
+python app.py
+
+# Then open your browser to http://localhost:5000
+# Upload any insurance policy PDF and get instant summaries
+```
 
 ## Output
 The script will generate a plain-language summary (under 200 words) covering:
 - What is covered
 - What is NOT covered (exclusions)
 - Important limits, waiting periods, and conditions
+
+## Technologies Used
+- **LangChain**: Document processing and LLM orchestration
+- **PyPDFLoader**: PDF text extraction
+- **RecursiveCharacterTextSplitter**: Document chunking
+- **Azure OpenAI GPT-4**: Summary generation
+- **Flask**: Web interface (for app.py)

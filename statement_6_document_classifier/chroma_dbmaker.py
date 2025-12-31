@@ -12,6 +12,46 @@ COLLECTION_NAME = "insurance_reference_docs"
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 
+# ---------------- Safety Check ----------------
+def check_existing_collection():
+    """Check if collection already exists and prompt user"""
+    if not os.path.exists(CHROMA_DB_PATH):
+        return True
+
+    try:
+        test_embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+        existing_db = Chroma(
+            persist_directory=CHROMA_DB_PATH,
+            collection_name=COLLECTION_NAME,
+            embedding_function=test_embeddings
+        )
+
+        try:
+            test_results = existing_db.similarity_search("test", k=1)
+            if test_results:
+                print(f"⚠️  WARNING: Collection '{COLLECTION_NAME}' already exists with data!")
+                print(f"📁 Location: {CHROMA_DB_PATH}")
+                print("\nOptions:")
+                print("  1. SKIP - Keep existing data and exit (recommended)")
+                print("  2. RECREATE - Delete and rebuild collection")
+
+                choice = input("\nEnter choice (1 or 2): ").strip()
+
+                if choice == "2":
+                    print("\n🗑️  Deleting existing collection...")
+                    existing_db.delete_collection()
+                    print("✅ Collection deleted. Proceeding with creation...\n")
+                    return True
+                else:
+                    print("\n✅ Keeping existing collection. Exiting...")
+                    return False
+        except:
+            return True
+
+    except Exception as e:
+        return True
+
+
 # ---------------- LOAD PDFs ----------------
 def load_reference_pdfs(folder_path):
     texts = []
@@ -60,4 +100,5 @@ def create_reference_db():
 
 # ---------------- MAIN ----------------
 if __name__ == "__main__":
-    create_reference_db()
+    if check_existing_collection():
+        create_reference_db()

@@ -19,7 +19,11 @@ app.secret_key = os.urandom(24)  # Required for session management
 
 # ---------------- Setup (from main.py) ----------------
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-vector_db = Chroma(persist_directory="../shared/chroma_store", embedding_function=embeddings)
+vector_db = Chroma(
+    persist_directory="../shared/chroma_store",
+    embedding_function=embeddings,
+    collection_name="insurance_quotes"
+)
 
 # LLM1: Classifies user input
 llm1 = AzureChatOpenAI(

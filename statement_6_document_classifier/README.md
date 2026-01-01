@@ -1,7 +1,7 @@
 # Statement 6: Document Classifier
 
 ## Description
-Classifies insurance documents using embedding similarity against reference documents. Uses RAG-based approach to determine document types.
+An embedding-based document classification system that automatically categorizes incoming insurance documents (claim forms, inspection reports, invoices) by comparing them against reference document templates. The system uses HuggingFace sentence-transformers to convert both reference and test PDFs into vector embeddings, stores references in ChromaDB, then performs cosine similarity search to find the closest match. Each classification includes a **confidence score** (similarity percentage) indicating match strength. The architecture requires no explicit training—new document categories can be added simply by uploading reference PDFs to the vector database. Tested with 15 sample documents across 3 categories, achieving high-accuracy classification. The Flask web UI enables staff to upload any document and instantly receive its classification with confidence metrics—streamlining document intake and routing workflows.
 
 ## Files
 - `chroma_dbmaker.py` - Creates vector database from reference PDFs

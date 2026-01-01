@@ -1,7 +1,7 @@
 # Statement 4: Quote Comparison Chatbot
 
 ## Description
-A conversational assistant that compares multiple insurance quotes and explains differences in coverage, premium, and deductible in simple terms.
+A RAG-powered (Retrieval-Augmented Generation) conversational chatbot that helps customers and agents compare insurance quotes through natural language questions. The system employs a **two-LLM architecture**: a Classification LLM first determines whether the user's question requires database retrieval or is conversational, then an Answer LLM generates responses using semantically retrieved context from ChromaDB. Insurance plan data (premiums, deductibles, coverage limits, exclusions, waiting periods) is embedded using HuggingFace sentence-transformers and stored in a vector database for efficient similarity search. Users can ask questions like "Which plan has no deductible?", "Compare the 18000 and 28000 plans", or "Which is best for a family of 4?"—and receive detailed, contextual comparisons in plain language.
 
 ## Files
 - `chroma_db_maker.py` - Creates vector database from insurance plans

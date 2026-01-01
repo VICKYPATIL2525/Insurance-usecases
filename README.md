@@ -1,6 +1,16 @@
 # Insurance GenAI Solutions
 
-This project contains 5 GenAI-powered insurance tools demonstrating various applications of LLMs in the insurance domain.
+A comprehensive suite of 5 GenAI-powered tools that automate and enhance core insurance operations using Large Language Models (Azure OpenAI GPT-4), vector databases (ChromaDB), and RAG (Retrieval-Augmented Generation) pipelines. Each tool addresses a specific insurance workflow—from policy document summarization and claims normalization to quote comparison, underwriting risk assessment, and document classification—demonstrating practical enterprise AI applications with both CLI and web interfaces.
+
+## What This Project Does
+
+| Tool | Problem Solved | AI Technique |
+|------|----------------|--------------|
+| **Policy Summary** | Condenses 50+ page insurance policies into plain-language summaries | Document chunking + LLM summarization |
+| **Claims Normalizer** | Converts unstructured adjuster notes into structured JSON | LLM extraction with Pydantic validation |
+| **Quote Comparison** | Answers natural language questions about insurance plans | RAG with two-LLM classification system |
+| **Underwriting Assistant** | Automates risk scoring from applicant documents | Multi-document LLM analysis |
+| **Document Classifier** | Categorizes incoming documents by type | Embedding similarity matching |
 
 ## Project Structure
 

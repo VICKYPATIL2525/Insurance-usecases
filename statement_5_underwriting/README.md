@@ -1,7 +1,7 @@
 # Statement 5: Underwriting Assistant
 
 ## Description
-A GenAI-powered co-pilot that helps underwriters assess risk by summarizing applicant data, prior claims, and external reports.
+An AI-powered underwriting co-pilot that automates insurance risk assessment by analyzing multiple applicant documents simultaneously. The system ingests three PDF document types per applicant—**Applicant Data** (personal info, medical history), **Prior Claims** (historical claims records), and **External Reports** (third-party assessments)—then uses Azure OpenAI GPT-4 to synthesize this information into a comprehensive risk evaluation. Output is structured via Pydantic schema into: a **Risk Score** (0-100), **Risk Level** (LOW/MEDIUM/HIGH), plain-language **Risk Summary**, itemized **Key Risk Factors**, **Positive Indicators**, and **Underwriter Notes**. Includes 10 pre-loaded test applicants across all risk tiers (30 PDFs total) for validation. The Flask web UI allows underwriters to upload new applicant documents and receive instant, consistent risk assessments—augmenting human judgment with AI-powered analysis.
 
 ## Files
 - `main.py` - Main underwriting analysis script (CLI version)

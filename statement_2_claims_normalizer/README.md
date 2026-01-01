@@ -1,7 +1,7 @@
 # Statement 2: Claims Description Normalizer
 
 ## Description
-Develop an AI model that converts raw claim notes (free-text from adjusters or customers) into structured data—detecting loss type, severity, and affected asset.
+An NLP-based claims processing tool that converts unstructured, free-text claim notes (written by adjusters or customers in varying styles) into standardized, structured JSON data. Using Azure OpenAI GPT-4 with Pydantic schema validation, the system extracts three critical fields from each claim: **loss_type** (e.g., Accident, Theft, Water Damage), **severity** (Low/Medium/High), and **affected_asset** (e.g., Vehicle, Property, Electronics). Supports both single-claim interactive processing and batch processing via CSV files containing multiple claims. The Flask web UI enables insurance staff to paste claim descriptions or upload CSV batches and receive consistent, machine-readable output—eliminating manual data entry and ensuring uniform claim categorization for downstream processing.
 
 ## Files
 - `main_single_processing.py` - Single claim processing

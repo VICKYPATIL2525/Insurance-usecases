@@ -30,9 +30,11 @@ def check_existing_collection():
 
         # Check if collection has data
         try:
-            test_results = existing_db.similarity_search("test", k=1)
-            if test_results:
-                print(f"⚠️  WARNING: Collection '{COLLECTION_NAME}' already exists with data!")
+            # Check collection count instead of similarity search (more reliable)
+            count = existing_db._collection.count()
+
+            if count > 0:
+                print(f"⚠️  WARNING: Collection '{COLLECTION_NAME}' already exists with {count} documents!")
                 print(f"📁 Location: {CHROMA_DIR}")
                 print("\nOptions:")
                 print("  1. SKIP - Keep existing data and exit (recommended)")
@@ -48,8 +50,15 @@ def check_existing_collection():
                 else:
                     print("\n✅ Keeping existing collection. Exiting...")
                     return False
-        except:
-            # Collection exists but is empty, proceed
+            else:
+                # Collection exists but is empty, delete and recreate
+                print(f"Found empty collection '{COLLECTION_NAME}', recreating...\n")
+                existing_db.delete_collection()
+                return True
+
+        except Exception as e:
+            # Collection doesn't exist or error reading, proceed
+            print(f"Collection check failed (will create new): {e}\n")
             return True
 
     except Exception as e:

@@ -49,7 +49,7 @@ def classify_folder(folder_path):
     Args:
         folder_path: Path to the folder containing PDFs to classify
     """
-    # Initialize the embedding model (converts text to numerical vectors)
+    # Initialize the embedding model
     embedding = HuggingFaceEmbeddings(
         model_name=EMBEDDING_MODEL
     )
@@ -102,10 +102,10 @@ def classify_folder(folder_path):
 
         # ---- FINAL OUTPUT (NO LLM LOGIC NOW) ----
         # Display classification results for this PDF
-        print(f"📄 File: {file_name}")
+        print(f"   📄 File: {file_name}")
         print(f"   ✅ Classified as: {best_match}")           # The most similar reference document
         print(f"   📊 Confidence: {best_score:.2f}%")         # How confident the classification is
-        print("   🔧 Method: Embedding Similarity\n")         # Classification method used
+        print("    🔧 Method: Embedding Similarity\n")         # Classification method used
 
 
 # ---------------- MAIN ----------------

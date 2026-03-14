@@ -87,5 +87,5 @@ Uses shared vector database at `../shared/chroma_store/`
 - **LangChain**: RAG pipeline orchestration
 - **ChromaDB**: Vector database for insurance plan embeddings
 - **HuggingFace Embeddings**: Sentence transformer model
-- **Azure OpenAI GPT-4**: Question classification and answer generation
+- **Azure OpenAI (gpt-4.1-mini)**: Question classification and answer generation
 - **Flask**: Web interface (for app.py)

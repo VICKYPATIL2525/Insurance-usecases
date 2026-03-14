@@ -1,7 +1,7 @@
 # Statement 6: Document Classifier
 
 ## Description
-An embedding-based document classification system that automatically categorizes incoming insurance documents (claim forms, inspection reports, invoices) by comparing them against reference document templates. The system uses HuggingFace sentence-transformers to convert both reference and test PDFs into vector embeddings, stores references in ChromaDB, then performs cosine similarity search to find the closest match. Each classification includes a **confidence score** (similarity percentage) indicating match strength. The architecture requires no explicit training—new document categories can be added simply by uploading reference PDFs to the vector database. Tested with 15 sample documents across 3 categories, achieving high-accuracy classification. The Flask web UI enables staff to upload any document and instantly receive its classification with confidence metrics—streamlining document intake and routing workflows.
+An embedding-based document classification system that automatically categorizes incoming insurance documents (claim forms, inspection reports, invoices) by comparing them against reference document templates. The system uses HuggingFace sentence-transformers to convert both reference and test PDFs into vector embeddings, stores references in ChromaDB, then performs cosine similarity search to find the closest match. Each classification includes a **confidence score** (similarity percentage) indicating match strength. The architecture requires no explicit training—new document categories can be added simply by uploading reference PDFs to the vector database. Tested with 14 sample documents across 3 categories, achieving high-accuracy classification. The Flask web UI enables staff to upload any document and instantly receive its classification with confidence metrics—streamlining document intake and routing workflows.
 
 ## Files
 - `chroma_dbmaker.py` - Creates vector database from reference PDFs
@@ -10,8 +10,7 @@ An embedding-based document classification system that automatically categorizes
 - `templates/document_classifier.html` - Web interface HTML
 - `uploads/` - Folder for user-uploaded documents (web UI)
 - `data/vector_db/` - Reference documents (3 PDFs)
-- `data/st_test_1/` - Test set 1 (4 PDFs)
-- `data/testing/` - Test set 2 (15 PDFs)
+- `data/testing/` - Test documents (14 PDFs)
 
 ## Data Structure
 
@@ -22,11 +21,8 @@ These are the "ground truth" documents used for classification:
 - `invoice_vector.pdf` - Service invoice/bill
 
 ### Test Documents
-**Test Set 1** (`st_test_1/` - 4 PDFs):
-- Various claim forms and invoices
-
-**Test Set 2** (`testing/` - 15 PDFs):
-- 5 claim form variations (`claim_form_test_1.pdf` to `claim_form_test_5.pdf`)
+**Test Set** (`testing/` - 14 PDFs):
+- 4 claim form variations (`claim_form_test_1.pdf` to `claim_form_test_4.pdf`)
 - 5 inspection report variations (`inspection_report_test_1.pdf` to `inspection_report_test_5.pdf`)
 - 5 invoice variations (`invoice_test_1.pdf` to `invoice_test_5.pdf`)
 
@@ -48,7 +44,7 @@ Collection name: `insurance_reference_docs`
 ```bash
 python main.py
 ```
-Classifies all test documents and displays results with similarity scores.
+Classifies all test documents in `data/testing/` and displays results with similarity scores.
 
 #### Web UI Version
 ```bash

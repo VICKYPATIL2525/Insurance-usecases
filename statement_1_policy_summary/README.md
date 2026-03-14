@@ -1,7 +1,7 @@
 # Statement 1: Policy Summary Assistant
 
 ## Description
-An LLM-powered document summarization tool that transforms lengthy insurance policy PDFs (often 50+ pages of legal language) into concise, customer-friendly summaries under 200 words. The system uses LangChain's RecursiveCharacterTextSplitter to chunk documents into processable segments, then leverages Azure OpenAI GPT-4 to extract and synthesize key policy information—coverage details, exclusions, limits, waiting periods, and special conditions. Includes an optimized version with parallel batch processing that achieves 3-5x faster processing for large documents. Both CLI and Flask web interfaces allow users to upload any insurance PDF and receive instant plain-language summaries.
+An LLM-powered document summarization tool that transforms lengthy insurance policy PDFs (often 50+ pages of legal language) into concise, customer-friendly summaries under 200 words. The system uses LangChain's RecursiveCharacterTextSplitter to chunk documents into processable segments, then leverages Azure OpenAI GPT-4.1-mini to extract and synthesize key policy information—coverage details, exclusions, limits, waiting periods, and special conditions. Includes an optimized version with parallel batch processing that achieves 3-5x faster processing for large documents. Both CLI and Flask web interfaces allow users to upload any insurance PDF and receive instant plain-language summaries.
 
 ## Files
 - `main.py` - Original implementation
@@ -49,5 +49,5 @@ The script will generate a plain-language summary (under 200 words) covering:
 - **LangChain**: Document processing and LLM orchestration
 - **PyPDFLoader**: PDF text extraction
 - **RecursiveCharacterTextSplitter**: Document chunking
-- **Azure OpenAI GPT-4**: Summary generation
+- **Azure OpenAI (gpt-4.1-mini)**: Summary generation
 - **Flask**: Web interface (for app.py)

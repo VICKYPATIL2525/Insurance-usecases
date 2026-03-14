@@ -1,7 +1,7 @@
 # Statement 5: Underwriting Assistant
 
 ## Description
-An AI-powered underwriting co-pilot that automates insurance risk assessment by analyzing multiple applicant documents simultaneously. The system ingests three PDF document types per applicant—**Applicant Data** (personal info, medical history), **Prior Claims** (historical claims records), and **External Reports** (third-party assessments)—then uses Azure OpenAI GPT-4 to synthesize this information into a comprehensive risk evaluation. Output is structured via Pydantic schema into: a **Risk Score** (0-100), **Risk Level** (LOW/MEDIUM/HIGH), plain-language **Risk Summary**, itemized **Key Risk Factors**, **Positive Indicators**, and **Underwriter Notes**. Includes 10 pre-loaded test applicants across all risk tiers (30 PDFs total) for validation. The Flask web UI allows underwriters to upload new applicant documents and receive instant, consistent risk assessments—augmenting human judgment with AI-powered analysis.
+An AI-powered underwriting co-pilot that automates insurance risk assessment by analyzing multiple applicant documents simultaneously. The system ingests three PDF document types per applicant—**Applicant Data** (personal info, medical history), **Prior Claims** (historical claims records), and **External Reports** (third-party assessments)—then uses Azure OpenAI GPT-4.1-mini to synthesize this information into a comprehensive risk evaluation. Output is structured via Pydantic schema into: a **Risk Score** (0-100), **Risk Level** (LOW/MEDIUM/HIGH), plain-language **Risk Summary**, itemized **Key Risk Factors**, **Positive Indicators**, and **Underwriter Notes**. Includes 10 pre-loaded test applicants across all risk tiers (30 PDFs total) for validation. The Flask web UI allows underwriters to upload new applicant documents and receive instant, consistent risk assessments—augmenting human judgment with AI-powered analysis.
 
 ## Files
 - `main.py` - Main underwriting analysis script (CLI version)
@@ -38,17 +38,17 @@ Each applicant folder contains 3 PDFs:
 
 ### CLI Version
 ```bash
-# Edit main.py line 228 to change the applicant folder
+# Edit main.py line 23 to change the applicant folder
 python main.py
 ```
 
-Example: Change line 228 from:
+Example: Change line 23 from:
 ```python
-applicant_folder = "Vikram_Patel_LOW"
+folder_path = r"data\Kamala_Venkatesh_HIGH"
 ```
 to:
 ```python
-applicant_folder = "Bharat_Mishra_HIGH"
+folder_path = r"data\Bharat_Mishra_HIGH"
 ```
 
 ### Web UI Version
@@ -72,6 +72,6 @@ Structured risk assessment using Pydantic `UnderwritingAnalysis` schema:
 ## Technologies Used
 - **LangChain**: Document processing and LLM orchestration
 - **PyPDFLoader**: PDF text extraction
-- **Azure OpenAI GPT-4**: Risk assessment analysis
+- **Azure OpenAI (gpt-4.1-mini)**: Risk assessment analysis
 - **Pydantic**: Structured output validation (UnderwritingAnalysis schema)
 - **Flask**: Web interface (for app.py)

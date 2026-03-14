@@ -1,6 +1,6 @@
 # Insurance GenAI Solutions
 
-A comprehensive suite of 5 GenAI-powered tools that automate and enhance core insurance operations using Large Language Models (Azure OpenAI GPT-4), vector databases (ChromaDB), and RAG (Retrieval-Augmented Generation) pipelines. Each tool addresses a specific insurance workflow—from policy document summarization and claims normalization to quote comparison, underwriting risk assessment, and document classification—demonstrating practical enterprise AI applications with both CLI and web interfaces.
+A comprehensive suite of 5 GenAI-powered tools that automate and enhance core insurance operations using Large Language Models (Azure OpenAI GPT-4.1-mini), vector databases (ChromaDB), and RAG (Retrieval-Augmented Generation) pipelines. Each tool addresses a specific insurance workflow—from policy document summarization and claims normalization to quote comparison, underwriting risk assessment, and document classification—demonstrating practical enterprise AI applications with both CLI and web interfaces.
 
 ## What This Project Does
 
@@ -119,7 +119,7 @@ python app.py                # Access at http://localhost:5002
 ### Statement 5: Underwriting Assistant
 ```bash
 cd statement_5_underwriting
-# CLI version (edit line 228 in main.py to change applicant)
+# CLI version (edit line 23 in main.py to change applicant)
 python main.py
 
 # Web UI version
@@ -140,7 +140,7 @@ python app.py                # Access at http://localhost:5004
 ## Technologies Used
 
 - **LangChain**: Framework for LLM applications
-- **Azure OpenAI**: GPT-4 models for text generation
+- **Azure OpenAI**: GPT-4.1-mini model for text generation
 - **ChromaDB**: Vector database for embeddings
 - **HuggingFace**: Sentence transformers for embeddings
 - **PyPDF**: PDF document processing

@@ -6,7 +6,7 @@ Demo idea: Upload a sample policy PDF → auto-generate a 200-word summary.'''
 
 import os
 import re
-import time  # ⚡ NEW: Added for performance tracking
+import time  #Added for performance tracking
 from dotenv import load_dotenv
 
 # ---------------- Load env ----------------
@@ -33,12 +33,12 @@ def extract_text_from_pdf_langchain(pdf_path: str) -> str:
 pdf_text = extract_text_from_pdf_langchain(path)
 
 print("===== RAW EXTRACTED TEXT =====")
-print(pdf_text[:1000])
+print(pdf_text[:500]) #printing only first 500 chars
 print("=" * 150)
 
 
 # ---------------- Simple Lossless Preprocessing ----------------
-# ✅ UNCHANGED: Same as original
+
 def preprocess_text_basic(text: str) -> tuple[str, dict]:
     original_length = len(text)
 
@@ -79,7 +79,7 @@ print(clean_text[:1000])
 
 
 # ---------------- Azure OpenAI LLM ----------------
-# ✅ UNCHANGED: Same as original
+
 llm = AzureChatOpenAI(
     deployment_name="gpt-4.1-mini",
     temperature=0.1,
@@ -91,7 +91,7 @@ llm = AzureChatOpenAI(
 
 
 # ---------------- Chunking ----------------
-# ✅ UNCHANGED: Same as original
+
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=3000,
     chunk_overlap=150
@@ -149,7 +149,7 @@ def summarize_chunks_parallel(chunks: list[str]) -> list[str]:
     # Adjust this based on your Azure OpenAI rate limits (5-10 is safe)
     responses = llm.batch(
         all_messages,
-        config={"max_concurrency": 5}  # Process 5 chunks at a time
+        config={"max_concurrency": 7}  # Process 7 chunks at a time
     )
 
     # ⚡ NEW: Extract content from all responses
@@ -217,7 +217,7 @@ print(final_summary)
 # - Method: Parallel batch processing with llm.batch()
 # - Time for 10 chunks: ~10-15 seconds
 # - Speedup: 3-5x faster
-# - Key parameter: max_concurrency=5 (adjust based on rate limits)
+# - Key parameter: max_concurrency=7 (adjust based on rate limits)
 #
 # WHAT TO ADJUST:
 # 1. max_concurrency: Increase to 10 if you have higher rate limits

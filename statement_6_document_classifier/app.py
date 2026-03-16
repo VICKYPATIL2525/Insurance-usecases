@@ -3,7 +3,7 @@ Wraps the main.py logic for PDF classification into a web interface'''
 
 import os
 from flask import Flask, request, jsonify, render_template
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename # for secure file handling
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_huggingface import HuggingFaceEmbeddings

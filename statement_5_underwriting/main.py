@@ -63,14 +63,14 @@ You must:
 - Base conclusions ONLY on the provided data
 """
 
-
+# This function extracts text from a PDF file using PyPDFLoader and concatenates the content of all pages into a single string.
 def extract_text_from_pdf(pdf_path: str) -> str:
     """Extract text from a single PDF file."""
     loader = PyPDFLoader(pdf_path)
     documents = loader.load()
     return "\n".join(doc.page_content for doc in documents)
 
-
+# This function performs basic text preprocessing by removing extra whitespace, tabs, and reducing multiple newlines to a maximum of two. It ensures the extracted text is cleaner and more consistent for analysis.
 def preprocess_text(text: str) -> str:
     """Basic text preprocessing - remove extra whitespace."""
     text = re.sub(r"\t+", " ", text)
@@ -78,7 +78,7 @@ def preprocess_text(text: str) -> str:
     text = re.sub(r"\n\s*\n\s*\n+", "\n\n", text)
     return text.strip()
 
-
+# This function reads all PDF files from a specified folder, extracts and preprocesses their text content, and returns a dictionary where the keys are the filenames and the values are the cleaned text. It also includes verbose output to track progress and handle errors gracefully.
 def read_all_pdfs_from_folder(folder_path: str, verbose: bool = True) -> dict:
     """
     Read all PDF files from a folder and return their contents.
@@ -99,11 +99,11 @@ def read_all_pdfs_from_folder(folder_path: str, verbose: bool = True) -> dict:
 
     # Get all PDF files in the folder
     pdf_files = [f for f in os.listdir(folder_path) if f.lower().endswith('.pdf')]
-
+    # Handle case where no PDFs are found
     if not pdf_files:
         print(f"No PDF files found in '{folder_path}'")
         return results
-
+    
     if verbose:
         print(f"Found {len(pdf_files)} PDF file(s) in '{folder_path}'")
         print("=" * 80)
@@ -139,7 +139,7 @@ def read_all_pdfs_from_folder(folder_path: str, verbose: bool = True) -> dict:
             results[pdf_file] = None
 
     return results
-
+# This function takes a dictionary of document contents, combines them with clear labels, and uses a structured LLM to generate an underwriting analysis. It handles cases where documents may be missing or empty and ensures the output is structured according to the UnderwritingAnalysis model.
 def generate_underwriting_summary(documents: dict, max_chars_per_doc: int = 5000) -> UnderwritingAnalysis:
     """
     Takes extracted text from multiple underwriting documents
@@ -195,7 +195,7 @@ DOCUMENTS:
     response = structured_llm.invoke(messages)
     return response
 
-
+# This function takes the structured underwriting analysis and formats it into a readable string output. It conditionally includes sections for key risk factors and positive indicators only if they are present, ensuring the output is concise and relevant.
 def format_underwriting_output(analysis: UnderwritingAnalysis) -> str:
     """Format the structured analysis into a readable string."""
     output = []

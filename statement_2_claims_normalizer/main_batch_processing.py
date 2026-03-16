@@ -70,7 +70,7 @@ Claim description:
 def process_single_claim():
     """Process a single hardcoded claim"""
     print("\n=== SINGLE CLAIM PROCESSING ===\n")
-
+    # We have to change the claim text as per our requirement. This is just an example claim text to show how the function works.
     # Example claim text to process
     claim_text = """
 Was driving home last night, heavy rain, car skidded and hit the divider.
@@ -96,7 +96,7 @@ Front bumper damaged badly, airbags deployed. Driver safe.
 def process_batch_claims():
     """Process multiple claims from CSV file"""
     print("\n=== BATCH CLAIM PROCESSING ===\n")
-
+#here we have to add the path of the csv file which contains the claim_id and claim_text columns.
     csv_file = "data/statement_2_claims.csv"
 
     # Check if CSV file exists

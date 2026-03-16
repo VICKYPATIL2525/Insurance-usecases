@@ -38,7 +38,7 @@ print("=" * 150)
 
 
 # ---------------- Simple Lossless Preprocessing ----------------
-
+#removing space, tabs, and blank lines
 def preprocess_text_basic(text: str) -> tuple[str, dict]:
     original_length = len(text)
 

@@ -1,0 +1,459 @@
+================================================================================
+              INSURANCE GenAI SOLUTIONS - DETAILED PROJECT EXPLANATIONS
+================================================================================
+
+This document provides an in-depth explanation of each project (statement) in the
+Insurance GenAI Solutions workspace. The suite contains 5 AI-powered tools that
+automate core insurance operations using Azure OpenAI, ChromaDB, and LangChain.
+
+All projects share:
+  - Azure OpenAI (gpt-4.1-mini deployment) as the LLM backend
+  - Python with LangChain for LLM orchestration
+  - Flask for web interfaces
+  - Environment variables loaded from a shared .env file
+    (AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_VERSION, OPENAI_API_KEY)
+
+Port allocation:
+  - Statement 1: http://localhost:5000
+  - Statement 2: http://localhost:5001
+  - Statement 4: http://localhost:5002
+  - Statement 5: http://localhost:5003
+  - Statement 6: http://localhost:5004
+  (Statement 3 is not present in this codebase)
+
+Shared resources:
+  - shared/chroma_store/ - ChromaDB vector database directory used by Statements 4 & 6
+
+
+================================================================================
+  STATEMENT 1: POLICY SUMMARY ASSISTANT
+================================================================================
+
+PURPOSE:
+  Transforms lengthy insurance policy PDFs (often 50+ pages of legal language)
+  into concise, customer-friendly summaries under 200 words. The tool extracts
+  key information like coverage details, exclusions, limits, waiting periods,
+  and special conditions from complex policy documents.
+
+HOW IT WORKS (Map-Reduce Architecture):
+  The system follows a Map-Reduce summarization pattern:
+
+  Step 1 - PDF Extraction:
+    Uses LangChain's PyPDFLoader to extract raw text from every page of the
+    uploaded PDF document. All page texts are concatenated into a single string.
+
+  Step 2 - Text Preprocessing:
+    Cleans the extracted text by removing excessive whitespace, tabs, and blank
+    lines. This reduces noise and saves LLM tokens. The system tracks statistics
+    like original vs cleaned character count.
+
+  Step 3 - Document Chunking:
+    Uses RecursiveCharacterTextSplitter with chunk_size=3000 and
+    chunk_overlap=150 to split the cleaned text into manageable segments.
+    The overlap ensures no information is lost at chunk boundaries.
+
+  Step 4 - MAP Phase (Parallel Chunk Summarization):
+    Each chunk is sent to Azure OpenAI (gpt-4.1-mini) with a system prompt
+    instructing the LLM to act as an insurance domain expert and extract only
+    factual information about coverage, exclusions, limits, waiting periods,
+    and conditions. In the optimized version and web app, this is done in
+    parallel using llm.batch() with max_concurrency (5 in CLI, 10 in web app)
+    for 3-5x speedup. The original main.py processes chunks sequentially.
+
+  Step 5 - REDUCE Phase (Final Summary Generation):
+    All chunk summaries are combined and sent to the LLM as a single prompt.
+    The LLM generates a final plain-language summary under 200 words that
+    clearly explains: what is covered, what is NOT covered (exclusions), and
+    important limits/waiting periods/conditions.
+
+FILES:
+  - main.py: Original CLI implementation with sequential chunk processing.
+    Uses a hardcoded path to data/health_insurance_document.pdf.
+  - main_optimized.py: Enhanced CLI version that uses llm.batch() for parallel
+    chunk processing (max_concurrency=5), achieving 3-5x faster processing.
+  - app.py: Flask web application (port 5000) that provides:
+    * File upload endpoint (/upload) with background thread processing
+    * Server-Sent Events (/progress/<task_id>) for real-time progress updates
+    * Synchronous summarize endpoint (/summarize) for API usage
+    Uses max_concurrency=10 and supports PDFs up to 16MB.
+  - templates/index.html: Web interface for uploading PDFs and viewing summaries
+  - data/health_insurance_document.pdf: Sample health insurance policy document
+
+TECHNIQUES USED:
+  - Map-Reduce summarization pattern
+  - Parallel LLM batch processing
+  - Document chunking with overlap
+  - Server-Sent Events for real-time progress streaming
+
+LLM CONFIGURATION:
+  - Model: Azure OpenAI gpt-4.1-mini
+  - Temperature: 0.0 (web app), 0.1 (CLI versions)
+  - Max tokens: 400 per call
+
+
+================================================================================
+  STATEMENT 2: CLAIMS DESCRIPTION NORMALIZER
+================================================================================
+
+PURPOSE:
+  Converts unstructured, free-text insurance claim notes (written by adjusters
+  or customers in varying styles and formats) into standardized, structured JSON
+  data. This eliminates manual data entry and ensures uniform claim categorization
+  for downstream insurance processing systems.
+
+HOW IT WORKS (Structured LLM Output):
+  Step 1 - Input Reception:
+    Accepts either a single claim description (free text) or a CSV file
+    containing multiple claims with columns: claim_id and claim_text.
+
+  Step 2 - LLM Structured Extraction:
+    Each claim description is sent to Azure OpenAI with a system prompt
+    instructing the LLM to act as an insurance claims expert. The LLM extracts
+    exactly three fields:
+      * loss_type: The type of loss (e.g., Accident, Theft, Water Damage,
+        Fire, Natural Disaster, Vandalism)
+      * severity: The severity level (Low, Medium, or High)
+      * affected_asset: What was affected (e.g., Vehicle, Property, Electronics,
+        Jewelry, Furniture)
+    The LLM is configured with with_structured_output(ClaimSchema) using a
+    TypedDict schema, ensuring the output always matches the expected format.
+    If information is missing from the claim text, the field returns null.
+
+  Step 3 - Output Generation:
+    Results are saved as JSON files. For batch processing, both individual
+    JSON files per claim and a combined batch results file are generated.
+
+FILES:
+  - main_single_processing.py: CLI script that processes a single hardcoded
+    claim text and saves the result to output/ folder as JSON.
+  - main_batch_processing.py: Interactive CLI offering a menu:
+    (1) Process a single claim entered by the user
+    (2) Batch process all claims from data/statement_2_claims.csv
+    (3) Exit
+    Saves individual + combined JSON files to output/ folder.
+  - app.py: Flask web application (port 5001) providing:
+    * /normalize-single: POST endpoint accepting JSON with claim_text
+    * /normalize-batch: POST endpoint accepting CSV file upload
+    Both save results to output/ folder and return JSON response.
+  - templates/claims_normalizer.html: Web interface for entering claims
+    or uploading CSV files
+  - data/statement_2_claims.csv: Sample dataset with 19 insurance claims
+
+OUTPUT FORMAT:
+  {
+    "loss_type": "Accident",
+    "severity": "High",
+    "affected_asset": "Vehicle"
+  }
+
+TECHNIQUES USED:
+  - LLM structured output with TypedDict schema enforcement
+  - Single and batch processing modes
+  - CSV parsing for bulk operations
+
+LLM CONFIGURATION:
+  - Model: Azure OpenAI gpt-4.1-mini
+  - Temperature: 0.0
+  - Max tokens: 200
+
+
+================================================================================
+  STATEMENT 4: QUOTE COMPARISON CHATBOT
+================================================================================
+
+PURPOSE:
+  A conversational RAG-powered chatbot that helps insurance customers and agents
+  compare insurance quotes through natural language questions. Users can compare
+  2-3 insurance plans by premium amount and ask follow-up questions about
+  coverage details, deductibles, waiting periods, family coverage, and more.
+
+HOW IT WORKS (Two-LLM RAG Architecture):
+  The system uses a sophisticated two-LLM architecture with ChromaDB as the
+  vector database for retrieval-augmented generation.
+
+  SETUP (One-Time - chroma_db_maker.py):
+    1. Loads insurance plan data from data/statement_4_data.json containing
+       10 insurance plans with details: premiums (Rs.16,500 to Rs.35,000),
+       sum insured, deductibles, coverage details, exclusions, waiting periods,
+       and family coverage information.
+    2. Converts each plan into a LangChain Document with metadata (including
+       the premium amount for exact filtering).
+    3. Embeds documents using HuggingFace sentence-transformers/all-MiniLM-L6-v2
+       and stores them in ChromaDB collection "insurance_quotes" at
+       ../shared/chroma_store/.
+    4. Safety check: If collection already exists, prompts user to skip or
+       recreate to prevent accidental data overwrites.
+
+  RUNTIME (Conversation Flow):
+    Step 1 - Question Classification (LLM1 - Classifier):
+      Every user message is first sent to the Classification LLM (gpt-4.1-mini,
+      temp=0.0). This LLM determines whether the message is:
+        * NEW: A fresh comparison request containing 2-3 premium amounts
+          (returns extracted premium values as JSON array)
+        * FOLLOW_UP: A question about previously compared plans
+        * INVALID: An unrelated or unclear message
+      This classification prevents unnecessary database queries for follow-up
+      questions and rejects off-topic inputs.
+
+    Step 2 - Plan Retrieval (For NEW requests only):
+      When classified as NEW, the system queries ChromaDB using
+      similarity_search() with exact metadata filter {"premium": amount}
+      for each premium value provided. This retrieves the full plan details
+      for the requested plans.
+
+    Step 3 - Answer Generation (LLM2 - Advisor):
+      The Answer LLM (gpt-4.1-mini, temp=0.2) receives:
+        * A detailed system prompt defining it as an insurance advisor
+        * The retrieved plan details as context
+        * The conversation history (for multi-turn context)
+        * The user's current question
+      The LLM generates a comparison covering 7 dimensions: premium, sum
+      insured, deductible, family size, waiting periods, room rent, and
+      co-payment. Output format: summary table, then detailed comparison,
+      then recommendation.
+
+    Step 4 - Context Management:
+      For FOLLOW_UP questions, the system reuses the last retrieved plan
+      context instead of querying the database again. The conversation
+      history is maintained across turns for coherent multi-turn dialogue.
+
+FILES:
+  - chroma_db_maker.py: One-time setup script to create the vector database
+    from insurance plan JSON data.
+  - main.py: Interactive CLI chatbot with a while-loop for continuous
+    conversation. Prints usage instructions at startup.
+  - app.py: Flask web application (port 5002) with:
+    * /chat: POST endpoint for sending messages, maintains session state
+    * /reset: POST endpoint to clear conversation history
+    Uses Flask sessions to maintain per-user conversation context.
+  - templates/quote_comparison.html: Chat-style web interface
+  - data/statement_4_data.json: 10 insurance plans with full details
+  - data/statement_4_questions.json: Sample test questions
+
+USAGE FLOW:
+  1. User starts by comparing 2-3 plans: "compare 18000, 22500, 28000"
+  2. System retrieves matching plans from vector DB and generates comparison
+  3. User asks follow-ups: "which has no deductible?" or "best for family?"
+  4. System uses cached plan context + conversation history to answer
+
+TECHNIQUES USED:
+  - Retrieval-Augmented Generation (RAG)
+  - Two-LLM classification + generation pipeline
+  - Vector similarity search with metadata filtering
+  - Multi-turn conversation management
+  - HuggingFace sentence-transformer embeddings
+
+LLM CONFIGURATION:
+  - Classifier LLM: gpt-4.1-mini, temp=0.0, max_tokens=300
+  - Answer LLM: gpt-4.1-mini, temp=0.2, max_tokens=800
+  - Embedding: sentence-transformers/all-MiniLM-L6-v2
+  - Vector DB: ChromaDB collection "insurance_quotes"
+
+
+================================================================================
+  STATEMENT 5: UNDERWRITING ASSISTANT
+================================================================================
+
+PURPOSE:
+  An AI-powered underwriting co-pilot that automates insurance risk assessment
+  by analyzing multiple applicant documents simultaneously. It ingests three
+  types of PDF documents per applicant and produces a comprehensive, structured
+  risk evaluation to assist human underwriters in making informed decisions.
+
+HOW IT WORKS (Multi-Document LLM Analysis):
+  Step 1 - Document Ingestion:
+    For each applicant, the system reads three PDF documents:
+      * 1_Applicant_Data.pdf: Personal information, medical history, lifestyle
+        details, occupation, family health history
+      * 2_Prior_Claims.pdf: Historical insurance claims records, frequency
+        and severity of past claims
+      * 3_External_Reports.pdf: Third-party verification reports, credit
+        history, medical exam results, background checks
+    All PDFs are extracted using PyPDFLoader and preprocessed.
+
+  Step 2 - Text Preparation:
+    Each document's text is truncated to a maximum of 5000 characters to fit
+    within LLM context limits while retaining the most relevant information.
+    Documents are labeled with their filenames for context.
+
+  Step 3 - LLM Risk Analysis:
+    All document texts are combined into a single prompt and sent to Azure
+    OpenAI (gpt-4.1-mini) with a system prompt instructing the LLM to act
+    as an underwriting co-pilot. The LLM is explicitly told to:
+      * Summarize overall risk clearly
+      * Highlight key risk factors and positive indicators
+      * Assign a numerical risk score (0-100)
+      * Classify risk level (LOW/MEDIUM/HIGH)
+      * NOT approve or reject applications
+      * NOT invent facts beyond provided data
+
+  Step 4 - Structured Output:
+    The response is validated against a Pydantic BaseModel schema
+    (UnderwritingAnalysis) ensuring consistent output:
+      * risk_score: Integer 0-100
+      * risk_level: LOW, MEDIUM, or HIGH
+      * risk_summary: 2-3 sentence plain-language summary
+      * key_risk_factors: List of identified concerns
+      * positive_indicators: List of favorable factors
+      * underwriter_notes: Additional observations for the human underwriter
+
+FILES:
+  - main.py: CLI script that processes a hardcoded applicant folder
+    (default: data/Kamala_Venkatesh_HIGH). Change the folder_path
+    variable at line 23 to analyze different applicants.
+  - app.py: Flask web application (port 5003) that accepts multi-file
+    PDF uploads, creates a temporary processing folder, runs analysis,
+    returns structured results, and cleans up temp files.
+  - templates/underwriting.html: Web interface for uploading applicant
+    documents and viewing risk assessment results.
+  - data/: Contains 10 pre-loaded applicant folders (30 PDFs total):
+    LOW Risk (4):  Ananya_Sharma, Arjun_Nair, Neha_Kapoor, Vikram_Patel
+    MEDIUM Risk (3): Mohammed_Irfan_Khan, Rajesh_Kumar_Singh, Sunita_Devi_Agarwal
+    HIGH Risk (3): Bharat_Mishra, Kamala_Venkatesh, Prakash_Choudhary
+
+TECHNIQUES USED:
+  - Multi-document PDF extraction and analysis
+  - Pydantic BaseModel for structured LLM output validation
+  - Combined document context for holistic risk assessment
+  - Temporary file management for web uploads
+
+LLM CONFIGURATION:
+  - Model: Azure OpenAI gpt-4.1-mini
+  - Temperature: 0.0
+  - Max tokens: 1000
+  - Timeout: 30s, Max retries: 2
+  - Max characters per document: 5000
+
+
+================================================================================
+  STATEMENT 6: DOCUMENT CLASSIFIER
+================================================================================
+
+PURPOSE:
+  An embedding-based document classification system that automatically
+  categorizes incoming insurance documents (claim forms, inspection reports,
+  invoices) by comparing them against reference document templates. Unlike
+  the other statements, this system does NOT use an LLM for classification -
+  it relies purely on vector embedding similarity matching.
+
+HOW IT WORKS (Embedding Similarity Classification):
+  SETUP (One-Time - chroma_dbmaker.py):
+    1. Loads 3 reference PDF documents from data/vector_db/:
+       - claim_form_vector.pdf (standard insurance claim form template)
+       - inspection_report_vector.pdf (property inspection report template)
+       - invoice_vector.pdf (service invoice/bill template)
+    2. Extracts full text from each reference PDF using PyPDFLoader.
+    3. Embeds the text using HuggingFace sentence-transformers/all-MiniLM-L6-v2.
+    4. Stores embeddings in ChromaDB collection "insurance_reference_docs"
+       at ../shared/chroma_store/ with source filename as metadata.
+    5. Safety check: Prompts before overwriting existing collection.
+
+  RUNTIME (Classification):
+    Step 1 - Document Text Extraction:
+      The incoming PDF document is loaded and its full text is extracted
+      using PyPDFLoader.
+
+    Step 2 - Similarity Search:
+      The extracted text is used as a query against the ChromaDB collection.
+      The system performs similarity_search_with_score() with k=3, which
+      returns the 3 reference documents ranked by cosine similarity.
+
+    Step 3 - Classification:
+      The reference document with the highest similarity score is selected
+      as the classification result. The confidence score is calculated as:
+        confidence = (1 - distance_score) * 100
+      This converts the ChromaDB distance metric into a percentage.
+
+    Step 4 - Result:
+      Returns the classification (document type), confidence percentage,
+      and the top 3 similarity matches for transparency.
+
+  KEY ADVANTAGE:
+    No explicit model training required. New document categories can be
+    added simply by uploading new reference PDFs to the vector database
+    and re-running the chroma_dbmaker.py script.
+
+FILES:
+  - chroma_dbmaker.py: One-time setup script to create the reference
+    document vector database from the 3 template PDFs.
+  - main.py: CLI script that classifies all PDFs in data/testing/ folder.
+    Iterates through each PDF, classifies it, and prints the result with
+    confidence score.
+  - app.py: Flask web application (port 5004) with:
+    * /classify-single: POST endpoint for single PDF classification
+    * /classify-batch: POST endpoint for multiple PDF classification
+    Supports uploads up to 50MB.
+  - templates/document_classifier.html: Web interface for uploading
+    documents and viewing classification results.
+  - data/vector_db/: 3 reference template PDFs (the "ground truth"):
+    * claim_form_vector.pdf
+    * inspection_report_vector.pdf
+    * invoice_vector.pdf
+  - data/testing/: 14 test PDFs across 3 categories:
+    * 4 claim form variations (claim_form_test_1 to 4)
+    * 5 inspection report variations (inspection_report_test_1 to 5)
+    * 5 invoice variations (invoice_test_1 to 5)
+
+EXAMPLE OUTPUT:
+  Document: invoice_test_2.pdf
+  Classification: invoice_vector.pdf
+  Confidence: 94.5%
+
+TECHNIQUES USED:
+  - Pure embedding-based classification (no LLM required)
+  - Cosine similarity matching against reference templates
+  - Zero-shot classification via vector similarity
+  - HuggingFace sentence-transformer embeddings
+
+CONFIGURATION:
+  - Embedding: sentence-transformers/all-MiniLM-L6-v2
+  - Vector DB: ChromaDB collection "insurance_reference_docs"
+  - Similarity metric: Cosine distance converted to percentage
+  - No LLM is used - classification is purely embedding-based
+
+
+================================================================================
+  SHARED INFRASTRUCTURE
+================================================================================
+
+CHROMADB VECTOR DATABASE (shared/chroma_store/):
+  A single ChromaDB instance stored at shared/chroma_store/ is shared between
+  Statement 4 and Statement 6. Each statement uses its own separate collection:
+    - "insurance_quotes" (Statement 4): 10 insurance plan records
+    - "insurance_reference_docs" (Statement 6): 3 reference document templates
+  Collections are independent and can be created/recreated in any order.
+  Both statements can run simultaneously without conflicts.
+
+ENVIRONMENT CONFIGURATION (.env):
+  All projects read from a shared .env file in the project root containing:
+    - AZURE_OPENAI_ENDPOINT: Azure OpenAI service URL
+    - AZURE_OPENAI_VERSION: API version string
+    - OPENAI_API_KEY: Authentication key for Azure OpenAI
+
+DEPENDENCIES (requirements.txt):
+  Core dependencies shared across all projects:
+    - python-dotenv: Environment variable management
+    - flask: Web application framework
+    - langchain + extensions: LLM orchestration framework
+    - pypdf: PDF text extraction
+    - chromadb: Vector database (Statements 4 & 6)
+    - sentence-transformers: Embedding models (Statements 4 & 6)
+    - pydantic: Data validation schemas (Statements 2 & 5)
+
+
+================================================================================
+  AI TECHNIQUES SUMMARY
+================================================================================
+
+| Technique                    | Used In       | Description                          |
+|------------------------------|---------------|--------------------------------------|
+| Map-Reduce Summarization     | Statement 1   | Chunk docs, summarize each, combine  |
+| Structured LLM Output       | Statements 2,5| Force LLM to return typed schemas    |
+| RAG (Retrieval-Augmented)    | Statement 4   | Retrieve context then generate answer|
+| Two-LLM Pipeline            | Statement 4   | Classify intent then generate answer |
+| Embedding Similarity         | Statement 6   | Classify via vector distance match   |
+| Parallel Batch Processing    | Statement 1   | Process multiple LLM calls at once   |
+| Multi-Document Analysis      | Statement 5   | Combine multiple docs for analysis   |
+| Multi-Turn Conversation      | Statement 4   | Maintain chat history across turns   |
+
+================================================================================

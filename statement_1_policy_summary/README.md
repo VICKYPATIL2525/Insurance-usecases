@@ -4,8 +4,8 @@
 An LLM-powered document summarization tool that transforms lengthy insurance policy PDFs (often 50+ pages of legal language) into concise, customer-friendly summaries under 200 words. The system uses LangChain's RecursiveCharacterTextSplitter to chunk documents into processable segments, then leverages Azure OpenAI GPT-4.1-mini to extract and synthesize key policy information—coverage details, exclusions, limits, waiting periods, and special conditions. Includes an optimized version with parallel batch processing that achieves 3-5x faster processing for large documents. Both CLI and Flask web interfaces allow users to upload any insurance PDF and receive instant plain-language summaries.
 
 ## Files
-- `main.py` - Original implementation
-- `main_optimized.py` - Optimized version with parallel batch processing (3-5x faster)
+- `cli-v1.py` - Original implementation
+- `cli-v2-optimized.py` - Optimized version with parallel batch processing (3-5x faster)
 - `app.py` - Flask web UI for uploading and summarizing PDFs
 - `data/health_insurance_document.pdf` - Sample insurance policy document (172 KB)
 - `templates/index.html` - Web interface HTML
@@ -24,10 +24,10 @@ You can also use your own PDF files by:
 ### CLI Version
 ```bash
 # Original version
-python main.py
+python cli-v1.py
 
 # Optimized version (3-5x faster with parallel processing)
-python main_optimized.py
+python cli-v2-optimized.py
 ```
 
 ### Web UI Version

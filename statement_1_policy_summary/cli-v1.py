@@ -45,13 +45,13 @@ def preprocess_text_basic(text: str) -> tuple[str, dict]:
     multi_space_count = len(re.findall(r" {2,}", text))
     blank_line_count = len(re.findall(r"\n\s*\n\s*\n+", text))
 
-    text = re.sub(r"\t+", " ", text)
-    text = re.sub(r" {2,}", " ", text)
-    text = re.sub(r"\n\s*\n\s*\n+", "\n\n", text)
-    text = text.strip()
+    text = re.sub(r"\t+", " ", text)# Replace tabs with a single space
+    text = re.sub(r" {2,}", " ", text)# Collapse multiple spaces into one
+    text = re.sub(r"\n\s*\n\s*\n+", "\n\n", text)# Collapse multiple blank lines into two
+    text = text.strip()# Remove leading/trailing whitespace
 
     cleaned_length = len(text)
-
+    # this stats dictionary will be used to show the user how much cleaning was done and what kind of issues were found in the original text.
     stats = {
         "original_characters": original_length,
         "cleaned_characters": cleaned_length,

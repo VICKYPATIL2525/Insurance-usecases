@@ -23,7 +23,7 @@ path = r"data\health_insurance_document.pdf"
 
 
 # ---------------- Extract PDF Text ----------------
-# ✅ UNCHANGED: Same as original
+#  UNCHANGED: Same as original
 def extract_text_from_pdf_langchain(pdf_path: str) -> str:
     loader = PyPDFLoader(pdf_path)
     documents = loader.load()
@@ -162,11 +162,11 @@ def summarize_chunks_parallel(chunks: list[str]) -> list[str]:
     return summaries
 
 
-# ⚡ NEW: Call the optimized parallel version
+#  NEW: Call the optimized parallel version
 chunk_summaries = summarize_chunks_parallel(texts)
 
 # ===============================================================================
-# ⚡ OPTIMIZATION END
+#  OPTIMIZATION END
 # ===============================================================================
 
 

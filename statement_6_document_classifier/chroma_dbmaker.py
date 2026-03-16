@@ -63,6 +63,7 @@ def check_existing_collection():
 
 
 # ---------------- LOAD PDFs ----------------
+# This function loads all PDFs from the specified folder, extracts their text, and prepares metadata for each document. 
 def load_reference_pdfs(folder_path):
     texts = []
     metadatas = []

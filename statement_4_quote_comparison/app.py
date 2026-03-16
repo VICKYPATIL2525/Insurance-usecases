@@ -35,7 +35,7 @@ llm1 = AzureChatOpenAI(
 
 # LLM2: Generates comparison answers
 llm2 = AzureChatOpenAI(
-    deployment_name="gpt-4.1-mini", temperature=0.2, max_tokens=800,
+    deployment_name="gpt-4.1-mini", temperature=0.2, max_tokens=1500,
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
     api_version=os.getenv("AZURE_OPENAI_VERSION"),
     api_key=os.getenv("OPENAI_API_KEY"),
@@ -52,14 +52,15 @@ def understand_question(question, prev_questions):
     else:
         prev_context = "None"
 
-    system_msg = SystemMessage(content="""You are a query classifier for an insurance comparison chatbot.
+    system_msg = SystemMessage(content="""You are a query classifier 
+                               for an insurance comparison chatbot.
 
 Your job: Analyze user questions and extract premium amounts.
 
 Classification rules:
 1. NEW: User provides 2-3 premium amounts to compare
    - Must have at least 2 numbers
-   - Can be any format: "18000, 22500" or "compare 18k and 22.5k" or "18000 vs 22500"
+   - Can be any format: "18000, 22500" or "compare 18k and 22.5k" or "18000 vs 22.5k"
 
 2. FOLLOW_UP: User asks about previously shown results
    - Questions like "which is cheaper?", "which has no deductible?", "best for family of 4?"
@@ -97,13 +98,13 @@ Output: {"question_type": "INVALID", "premium_amounts": null, "reason": "Not ins
         )
 
     response = llm1.invoke([system_msg, human_msg])
-
+#trying to parse the response as JSON, if it fails we return INVALID with reason "Error parsing AI response"
     try:
         return json.loads(response.content)
     except:
         return {"question_type": "INVALID", "premium_amounts": None, "reason": "Error parsing AI response"}
 
-
+# This function queries the vector DB for plans matching the extracted premium amounts
 def get_plans(premiums):
     """Search vector DB for plans matching the given premium amounts"""
 
@@ -119,7 +120,7 @@ def get_plans(premiums):
 
     return plans
 
-
+# this function generates the answer using LLM2 based on the retrieved plans and conversation history
 def generate_answer(question, plans, history):
     """LLM2: Generate insurance plan comparison using conversation history"""
 

@@ -39,6 +39,19 @@ python app.py
 # Upload any insurance policy PDF and get instant summaries
 ```
 
+The web UI features **real-time progress tracking** via Server-Sent Events (SSE). Processing runs in a background thread, and the frontend receives live updates at each stage (extraction, preprocessing, chunking, chunk summarization, final summary).
+
+### API Endpoints (app.py)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Web interface |
+| GET | `/health` | Health check |
+| POST | `/upload` | Upload PDF, returns `task_id` for progress tracking |
+| GET | `/progress/<task_id>` | SSE stream for real-time progress updates |
+| POST | `/summarize` | Summarize a PDF by server path (JSON body: `pdf_path`) |
+
+- Max upload size: 16MB
+
 ## Output
 The script will generate a plain-language summary (under 200 words) covering:
 - What is covered
@@ -48,6 +61,7 @@ The script will generate a plain-language summary (under 200 words) covering:
 ## Technologies Used
 - **LangChain**: Document processing and LLM orchestration
 - **PyPDFLoader**: PDF text extraction
-- **RecursiveCharacterTextSplitter**: Document chunking
+- **RecursiveCharacterTextSplitter**: Document chunking (chunk_size=3000, chunk_overlap=150)
 - **Azure OpenAI (gpt-4.1-mini)**: Summary generation
-- **Flask**: Web interface (for app.py)
+- **Flask**: Web interface with SSE progress tracking (for app.py)
+- **Threading**: Background processing for non-blocking web requests

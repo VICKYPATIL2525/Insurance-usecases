@@ -60,6 +60,16 @@ python app.py
 # Upload applicant documents and get instant risk assessment
 ```
 
+### API Endpoints (app.py)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Web interface |
+| GET | `/health` | Health check |
+| POST | `/analyze` | Upload PDF files and receive structured risk assessment |
+
+- Max upload size: 50MB
+- Uploaded files are cleaned up automatically after analysis
+
 ## Output
 Structured risk assessment using Pydantic `UnderwritingAnalysis` schema:
 - **Risk Score**: 0-100 numerical score
@@ -72,6 +82,10 @@ Structured risk assessment using Pydantic `UnderwritingAnalysis` schema:
 ## Technologies Used
 - **LangChain**: Document processing and LLM orchestration
 - **PyPDFLoader**: PDF text extraction
-- **Azure OpenAI (gpt-4.1-mini)**: Risk assessment analysis
-- **Pydantic**: Structured output validation (UnderwritingAnalysis schema)
+- **Azure OpenAI (gpt-4.1-mini)**: Risk assessment analysis (timeout=30s, max_retries=2)
+- **Pydantic**: Structured output validation (`UnderwritingAnalysis` schema with `with_structured_output()`)
 - **Flask**: Web interface (for app.py)
+
+## Notes
+- Documents are truncated to 5000 chars each before LLM analysis (configurable via `max_chars_per_doc`)
+- CLI version supports `verbose=True/False` for controlling output detail during PDF extraction

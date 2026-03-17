@@ -41,6 +41,7 @@ def load_pdf_text(pdf_path):
 
 
 # ---------------- CLASSIFY ----------------
+# This function takes a folder path, loads each PDF file, extracts its text, and classifies it by comparing against reference documents in a vector database using embedding similarity. It prints the classification results for each PDF.
 def classify_folder(folder_path):
     """
     Classifies all PDF files in a folder by comparing them against reference documents

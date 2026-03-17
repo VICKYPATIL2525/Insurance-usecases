@@ -13,6 +13,7 @@ EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 
 # ---------------- Safety Check ----------------
+# This function checks if a Chroma collection already exists at the specified path. If it does, it prompts the user to either keep the existing collection (recommended) or delete and recreate it. This is important to prevent accidental data loss, as recreating the collection will erase all existing documents and their embeddings. The function returns True if it's safe to create a new collection, or False if the user chooses to keep the existing one.
 def check_existing_collection():
     """Check if collection already exists and prompt user"""
     if not os.path.exists(CHROMA_DB_PATH):
@@ -59,6 +60,7 @@ def check_existing_collection():
             return True
 
     except Exception as e:
+        print(f"Error checking existing collection: {e}")
         return True
 
 

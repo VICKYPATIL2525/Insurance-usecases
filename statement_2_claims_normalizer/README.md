@@ -17,17 +17,20 @@ An NLP-based claims processing tool that converts unstructured, free-text claim 
 
 ## How to Run
 
-### CLI Version - Single Claim
+### CLI Version - Single Claim (Hardcoded Example)
 ```bash
 python main_single_processing.py
 ```
-Enter a claim description when prompted, and get structured JSON output.
+Processes a hardcoded example claim (vehicle accident) and saves the structured JSON output to `output/`. To test a different claim, edit the `claim_text` variable in the script.
 
-### CLI Version - Batch Processing
+### CLI Version - Interactive Menu
 ```bash
 python main_batch_processing.py
 ```
-Processes all claims from `data/statement_2_claims.csv` and saves JSON files to `output/` folder.
+Shows a menu with 3 options:
+1. **Single Claim Processing** — processes a hardcoded example claim
+2. **Batch Processing (from CSV)** — reads all claims from `data/statement_2_claims.csv`, processes each one, and saves individual + combined JSON files to `output/`
+3. **Exit**
 
 ### Web UI Version
 ```bash
@@ -38,8 +41,16 @@ python app.py
 # Enter claims manually or upload CSV files
 ```
 
+### API Endpoints (app.py)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Web interface |
+| GET | `/health` | Health check |
+| POST | `/normalize-single` | Normalize a single claim (JSON body: `claim_text`) |
+| POST | `/normalize-batch` | Upload CSV file with multiple claims |
+
 ## Output Format
-The system extracts structured data using Pydantic schema:
+The system extracts structured data using TypedDict schema (`ClaimSchema`):
 ```json
 {
   "loss_type": "Accident",
@@ -48,8 +59,10 @@ The system extracts structured data using Pydantic schema:
 }
 ```
 
+Batch processing also saves a combined JSON file with all results timestamped (e.g., `batch_results_17-03-2026_02-30-00_PM.json`).
+
 ## Technologies Used
-- **LangChain**: LLM orchestration
+- **LangChain**: LLM orchestration with `with_structured_output()` for schema enforcement
 - **Azure OpenAI (gpt-4.1-mini)**: Text understanding and extraction
-- **TypedDict**: Structured output schema (ClaimSchema)
+- **TypedDict**: Structured output schema (`ClaimSchema` with `loss_type`, `severity`, `affected_asset`)
 - **Flask**: Web interface (for app.py)

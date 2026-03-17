@@ -55,6 +55,18 @@ python app.py
 # Upload documents to classify them automatically
 ```
 
+### API Endpoints (app.py)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Web interface |
+| GET | `/health` | Health check |
+| POST | `/classify-single` | Upload a single PDF for classification |
+| POST | `/classify-batch` | Upload multiple PDFs for batch classification |
+
+- Max upload size: 50MB
+- Uploaded files are cleaned up automatically after classification
+- Batch results include per-file classification with success/error status
+
 ## How It Works
 1. **Reference Embeddings**: Reference PDFs are converted to vector embeddings
 2. **Test Document Processing**: Test PDFs are extracted and embedded
@@ -71,7 +83,7 @@ Confidence: 94.5%
 
 ## Database
 - **Collection Name**: `insurance_reference_docs`
-- **Location**: `../shared/chroma_store/` (shared directory with Statement 4, separate collection)
+- **Location**: `../shared/chroma_store/` (shared directory, separate collection per project)
 - **Embedding Model**: HuggingFace sentence-transformers/all-MiniLM-L6-v2
 - **Safety**: Script prevents accidental overwrites by prompting before recreating
 
